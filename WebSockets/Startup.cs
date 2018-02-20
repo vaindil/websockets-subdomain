@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Rewrite;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace WebSockets
@@ -10,19 +14,11 @@ namespace WebSockets
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMemoryCache();
-            services.AddMvc(o =>
-            {
-                o.RequireHttpsPermanent = true;
-                o.Filters.Add(new RequireHttpsAttribute());
-            });
+            services.AddMvc();
         }
 
         public void Configure(IApplicationBuilder app)
         {
-            // this should already be done in nginx but meh
-            var options = new RewriteOptions().AddRedirectToHttps();
-            app.UseRewriter(options);
-
             app.UseWebSockets();
             app.UseMiddleware<FitzyWinLossMiddleware>();
             app.UseMvc();
