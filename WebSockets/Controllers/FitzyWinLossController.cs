@@ -7,6 +7,7 @@ namespace WebSockets.Controllers
     [Route("fitzy")]
     public class FitzyWinLossController : Controller
     {
+        private const string TOPSECRET = "ThereOnceWasAManFromPeruWhoDreamtHeWasEatingHisShoeHeWokeWithAFrightInTheMiddleOfTheNightToFindThatHisDreamHadComeTrue";
         private readonly IMemoryCache _cache;
 
         public FitzyWinLossController(IMemoryCache cache)
@@ -23,6 +24,12 @@ namespace WebSockets.Controllers
         [HttpPut("wins/{num}")]
         public IActionResult Wins(int num)
         {
+            if (!CheckHeader())
+                return Unauthorized();
+
+            if (num > 99)
+                num = 99;
+
             if (_cache.TryGetValue(CacheKeys.FitzyWins, out int wins))
             {
                 _cache.Set(CacheKeys.FitzyWins, num > -1 ? num : Math.Min(wins + 1, 99));
@@ -38,6 +45,9 @@ namespace WebSockets.Controllers
         [HttpPut("losses/{num}")]
         public IActionResult Losses(int num)
         {
+            if (!CheckHeader())
+                return Unauthorized();
+
             if (num > 99)
                 num = 99;
 
@@ -56,6 +66,12 @@ namespace WebSockets.Controllers
         [HttpPut("draws/{num}")]
         public IActionResult Draws(int num)
         {
+            if (!CheckHeader())
+                return Unauthorized();
+
+            if (num > 99)
+                num = 99;
+
             if (_cache.TryGetValue(CacheKeys.FitzyDraws, out int draws))
             {
                 _cache.Set(CacheKeys.FitzyDraws, num > -1 ? num : Math.Min(draws + 1, 99));
@@ -89,6 +105,14 @@ namespace WebSockets.Controllers
             });
 
             return $"WINS: {wins} | LOSSES: {losses} | DRAWS: {draws}";
+        }
+
+        private bool CheckHeader()
+        {
+            if (Request.Headers.TryGetValue("Authorization", out var header) && header.ToString() == TOPSECRET)
+                return true;
+
+            return false;
         }
     }
 }
