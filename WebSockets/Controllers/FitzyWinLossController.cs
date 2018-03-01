@@ -18,17 +18,11 @@ namespace WebSockets.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(GetCurrentRatio());
-        }
-
-        [HttpGet("raw")]
-        public IActionResult GetRaw()
-        {
             var record = GetCurrentRecord();
-            var result = $"{record.Wins}-{record.Losses}";
+            var result = $"Wins: {record.Wins} | Losses: {record.Losses}";
 
             if (record.Draws > 0)
-                result += $"-{record.Draws}";
+                result += $" | Draws: {record.Draws}";
 
             return Ok(result);
         }
@@ -94,13 +88,6 @@ namespace WebSockets.Controllers
             }
 
             return NoContent();
-        }
-
-        private string GetCurrentRatio()
-        {
-            var ratio = GetCurrentRecord();
-
-            return $"WINS: {ratio.Wins} | LOSSES: {ratio.Losses} | DRAWS: {ratio.Draws}";
         }
 
         private (int Wins, int Losses, int Draws) GetCurrentRecord()
