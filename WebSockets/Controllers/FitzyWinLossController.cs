@@ -21,6 +21,18 @@ namespace WebSockets.Controllers
             return Ok(GetCurrentRatio());
         }
 
+        [HttpGet("raw")]
+        public IActionResult GetRaw()
+        {
+            var record = GetCurrentRecord();
+            var result = $"{record.Wins}-{record.Losses}";
+
+            if (record.Draws > 0)
+                result += $"-{record.Draws}";
+
+            return Ok(result);
+        }
+
         [HttpPut("wins/{num}")]
         public IActionResult Wins(int num)
         {
@@ -86,6 +98,13 @@ namespace WebSockets.Controllers
 
         private string GetCurrentRatio()
         {
+            var ratio = GetCurrentRecord();
+
+            return $"WINS: {ratio.Wins} | LOSSES: {ratio.Losses} | DRAWS: {ratio.Draws}";
+        }
+
+        private (int Wins, int Losses, int Draws) GetCurrentRecord()
+        {
             var wins = _cache.GetOrCreate(CacheKeys.FitzyWins, entry =>
             {
                 entry.Priority = CacheItemPriority.NeverRemove;
@@ -104,7 +123,7 @@ namespace WebSockets.Controllers
                 return 0;
             });
 
-            return $"WINS: {wins} | LOSSES: {losses} | DRAWS: {draws}";
+            return (wins, losses, draws);
         }
 
         private bool CheckHeader()

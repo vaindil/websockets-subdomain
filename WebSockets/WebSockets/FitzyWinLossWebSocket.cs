@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace WebSockets
 {
-    public class FitzyWinLossMiddleware
+    public class FitzyWinLossWebSocket
     {
         private readonly RequestDelegate _next;
         private readonly IMemoryCache _cache;
@@ -19,7 +19,7 @@ namespace WebSockets
         private int _lossCount;
         private int _drawCount;
 
-        public FitzyWinLossMiddleware(RequestDelegate next, IMemoryCache cache)
+        public FitzyWinLossWebSocket(RequestDelegate next, IMemoryCache cache)
         {
             _next = next;
             _cache = cache;

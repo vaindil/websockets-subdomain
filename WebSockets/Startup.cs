@@ -19,7 +19,7 @@ namespace WebSockets
                 KeepAliveInterval = TimeSpan.FromSeconds(20)
             });
 
-            app.UseMiddleware<FitzyWinLossMiddleware>();
+            app.UseMiddleware<FitzyWinLossWebSocket>();
             app.UseMvc();
         }
     }
