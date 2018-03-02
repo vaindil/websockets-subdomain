@@ -1,18 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using System;
+using WebSockets.Classes;
 
 namespace WebSockets.Controllers
 {
     [Route("fitzy")]
     public class FitzyWinLossController : Controller
     {
-        private const string TOPSECRET = "ThereOnceWasAManFromPeruWhoDreamtHeWasEatingHisShoeHeWokeWithAFrightInTheMiddleOfTheNightToFindThatHisDreamHadComeTrue";
         private readonly IMemoryCache _cache;
+        private readonly string _apiSecret;
 
-        public FitzyWinLossController(IMemoryCache cache)
+        public FitzyWinLossController(IMemoryCache cache, IOptions<FitzyConfig> options)
         {
             _cache = cache;
+            _apiSecret = options.Value.ApiSecret;
         }
 
         [HttpGet]
@@ -115,7 +118,7 @@ namespace WebSockets.Controllers
 
         private bool CheckHeader()
         {
-            if (Request.Headers.TryGetValue("Authorization", out var header) && header.ToString() == TOPSECRET)
+            if (Request.Headers.TryGetValue("Authorization", out var header) && header.ToString() == _apiSecret)
                 return true;
 
             return false;
