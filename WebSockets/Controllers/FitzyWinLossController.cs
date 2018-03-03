@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System;
+using System.Threading.Tasks;
 using WebSockets.Classes;
+using WebSockets.Data;
 
 namespace WebSockets.Controllers
 {
@@ -10,11 +12,13 @@ namespace WebSockets.Controllers
     public class FitzyWinLossController : Controller
     {
         private readonly IMemoryCache _cache;
+        private readonly IRepository _db;
         private readonly string _apiSecret;
 
-        public FitzyWinLossController(IMemoryCache cache, IOptions<FitzyConfig> options)
+        public FitzyWinLossController(IMemoryCache cache, IRepository db, IOptions<FitzyConfig> options)
         {
             _cache = cache;
+            _db = db;
             _apiSecret = options.Value.ApiSecret;
         }
 
@@ -31,7 +35,7 @@ namespace WebSockets.Controllers
         }
 
         [HttpPut("wins/{num}")]
-        public IActionResult Wins(int num)
+        public async Task<IActionResult> Wins(int num)
         {
             if (!CheckHeader())
                 return Unauthorized();
@@ -41,18 +45,22 @@ namespace WebSockets.Controllers
 
             if (_cache.TryGetValue(CacheKeys.FitzyWins, out int wins))
             {
-                _cache.Set(CacheKeys.FitzyWins, num > -1 ? num : Math.Min(wins + 1, 99));
+                num = num > -1 ? num : Math.Min(wins + 1, 99);
+                _cache.Set(CacheKeys.FitzyWins, num);
             }
             else
             {
-                _cache.Set(CacheKeys.FitzyWins, num > -1 ? num : 1);
+                num = num > -1 ? num : 1;
+                _cache.Set(CacheKeys.FitzyWins, num);
             }
+
+            await _db.CreateOrUpdateAsync(CacheKeys.FitzyWins, num.ToString());
 
             return NoContent();
         }
 
         [HttpPut("losses/{num}")]
-        public IActionResult Losses(int num)
+        public async Task<IActionResult> Losses(int num)
         {
             if (!CheckHeader())
                 return Unauthorized();
@@ -62,18 +70,22 @@ namespace WebSockets.Controllers
 
             if (_cache.TryGetValue(CacheKeys.FitzyLosses, out int losses))
             {
-                _cache.Set(CacheKeys.FitzyLosses, num > -1 ? num : Math.Min(losses + 1, 99));
+                num = num > -1 ? num : Math.Min(losses + 1, 99);
+                _cache.Set(CacheKeys.FitzyLosses, num);
             }
             else
             {
-                _cache.Set(CacheKeys.FitzyLosses, num > -1 ? num : 1);
+                num = num > -1 ? num : 1;
+                _cache.Set(CacheKeys.FitzyLosses, num);
             }
+
+            await _db.CreateOrUpdateAsync(CacheKeys.FitzyLosses, num.ToString());
 
             return NoContent();
         }
 
         [HttpPut("draws/{num}")]
-        public IActionResult Draws(int num)
+        public async Task<IActionResult> Draws(int num)
         {
             if (!CheckHeader())
                 return Unauthorized();
@@ -83,12 +95,16 @@ namespace WebSockets.Controllers
 
             if (_cache.TryGetValue(CacheKeys.FitzyDraws, out int draws))
             {
-                _cache.Set(CacheKeys.FitzyDraws, num > -1 ? num : Math.Min(draws + 1, 99));
+                num = num > -1 ? num : Math.Min(draws + 1, 99);
+                _cache.Set(CacheKeys.FitzyDraws, num);
             }
             else
             {
-                _cache.Set(CacheKeys.FitzyDraws, num > -1 ? num : 1);
+                num = num > -1 ? num : 1;
+                _cache.Set(CacheKeys.FitzyDraws, num);
             }
+
+            await _db.CreateOrUpdateAsync(CacheKeys.FitzyDraws, num.ToString());
 
             return NoContent();
         }

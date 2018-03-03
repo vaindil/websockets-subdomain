@@ -28,7 +28,7 @@ namespace WebSockets.Data
             using (var db = Connection)
             {
                 return await db.QueryFirstOrDefaultAsync<KeyValue>(
-                    "SELECT \"key\", \"value\" FROM key_value WHERE \"key\" = @key", new { key });
+                    "SELECT \"key\", value FROM key_value WHERE \"key\" = @key", new { key });
             }
         }
 
@@ -37,10 +37,10 @@ namespace WebSockets.Data
             using (var db = Connection)
             {
                 await db.ExecuteAsync(
-                    "INSERT INTO key_value (\"key\", \"value\") " +
+                    "INSERT INTO key_value (\"key\", value) " +
                     "VALUES (@key, @value) " +
                     "ON CONFLICT (\"key\") DO UPDATE " +
-                        "SET \"value\" = @value",
+                        "SET value = @value",
                     new { key, value });
             }
 

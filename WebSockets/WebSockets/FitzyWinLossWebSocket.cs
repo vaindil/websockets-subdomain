@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
@@ -96,7 +95,6 @@ namespace WebSockets
                 {
                     _winCount = wins;
                     await MessageAllAsync(GetCurrentValues());
-                    await _db.CreateOrUpdateAsync(CacheKeys.FitzyWins, _winCount.ToString());
                 }
 
                 var losses = _cache.Get<int>(CacheKeys.FitzyLosses);
@@ -104,7 +102,6 @@ namespace WebSockets
                 {
                     _lossCount = losses;
                     await MessageAllAsync(GetCurrentValues());
-                    await _db.CreateOrUpdateAsync(CacheKeys.FitzyLosses, _lossCount.ToString());
                 }
 
                 var draws = _cache.Get<int>(CacheKeys.FitzyDraws);
@@ -112,7 +109,6 @@ namespace WebSockets
                 {
                     _drawCount = draws;
                     await MessageAllAsync(GetCurrentValues());
-                    await _db.CreateOrUpdateAsync(CacheKeys.FitzyDraws, _drawCount.ToString());
                 }
 
                 await Task.Delay(2000);
