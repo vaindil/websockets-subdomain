@@ -66,6 +66,10 @@ namespace WebSockets
             {
                 _drawCount = 0;
             }
+
+            _cache.Set(CacheKeys.FitzyWins, _winCount);
+            _cache.Set(CacheKeys.FitzyLosses, _lossCount);
+            _cache.Set(CacheKeys.FitzyDraws, _drawCount);
         }
 
         public async Task Invoke(HttpContext context)
@@ -75,29 +79,6 @@ namespace WebSockets
                 await _next(context);
                 return;
             }
-
-            if (_sockets.Count == 0)
-            {
-                _winCount = _cache.GetOrCreate(CacheKeys.FitzyWins, entry =>
-                {
-                    entry.Priority = CacheItemPriority.NeverRemove;
-                    return 0;
-                });
-
-                _lossCount = _cache.GetOrCreate(CacheKeys.FitzyLosses, entry =>
-                {
-                    entry.Priority = CacheItemPriority.NeverRemove;
-                    return 0;
-                });
-
-                _drawCount = _cache.GetOrCreate(CacheKeys.FitzyDraws, entry =>
-                {
-                    entry.Priority = CacheItemPriority.NeverRemove;
-                    return 0;
-                });
-            }
-
-            var x = context.RequestServices.GetRequiredService<IRepository>();
 
             var webSocket = await context.WebSockets.AcceptWebSocketAsync();
             var guid = Guid.NewGuid();
