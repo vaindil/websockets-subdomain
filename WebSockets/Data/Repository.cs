@@ -27,34 +27,31 @@ namespace WebSockets.Data
         {
             using (var db = Connection)
             {
-                db.Open();
                 return await db.QueryFirstOrDefaultAsync<KeyValue>(
-                    "SELECT key, value FROM key_value WHERE key = @key", new { key });
+                    "SELECT \"key\", \"value\" FROM key_value WHERE \"key\" = @key", new { key });
             }
         }
 
-        public async Task<KeyValue> CreateOrUpdateAsync(KeyValue kv)
+        public async Task<KeyValue> CreateOrUpdateAsync(string key, string value)
         {
             using (var db = Connection)
             {
-                db.Open();
                 await db.ExecuteAsync(
-                    "INSERT INTO key_value (key, value) " +
+                    "INSERT INTO key_value (\"key\", \"value\") " +
                     "VALUES (@key, @value) " +
-                    "ON CONFLICT (key) DO UPDATE " +
-                        "SET value = @value",
-                    new { key = kv.Key, value = kv.Value });
+                    "ON CONFLICT (\"key\") DO UPDATE " +
+                        "SET \"value\" = @value",
+                    new { key, value });
             }
 
-            return kv;
+            return new KeyValue(key, value);
         }
 
         public async Task DeleteByKeyAsync(string key)
         {
             using (var db = Connection)
             {
-                db.Open();
-                await db.ExecuteAsync("DELETE FROM key_value WHERE key = @key", new { key });
+                await db.ExecuteAsync("DELETE FROM key_value WHERE \"key\" = @key", new { key });
             }
         }
     }

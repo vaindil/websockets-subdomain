@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
 using WebSockets.Classes;
+using WebSockets.Data;
 
 namespace WebSockets
 {
@@ -25,6 +26,7 @@ namespace WebSockets
             services.AddMvc();
 
             services.AddSingleton(Configuration);
+            services.AddSingleton<IRepository, Repository>();
             services.Configure<FitzyConfig>(Configuration.GetSection("Fitzy"));
             services.Configure<TwitchConfig>(Configuration.GetSection("Twitch"));
         }

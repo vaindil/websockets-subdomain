@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using WebSockets.Data;
 
 namespace WebSockets
 {
@@ -13,16 +15,57 @@ namespace WebSockets
     {
         private readonly RequestDelegate _next;
         private readonly IMemoryCache _cache;
+        private readonly IRepository _db;
         private readonly ConcurrentDictionary<Guid, WebSocket> _sockets = new ConcurrentDictionary<Guid, WebSocket>();
 
         private int _winCount;
         private int _lossCount;
         private int _drawCount;
 
-        public FitzyWinLossWebSocket(RequestDelegate next, IMemoryCache cache)
+        public FitzyWinLossWebSocket(RequestDelegate next, IMemoryCache cache, IRepository db)
         {
             _next = next;
             _cache = cache;
+            _db = db;
+
+            InitializeCounts();
+        }
+
+        private async void InitializeCounts()
+        {
+            var winKv = await _db.GetByKeyAsync(CacheKeys.FitzyWins);
+            var lossKv = await _db.GetByKeyAsync(CacheKeys.FitzyLosses);
+            var drawKv = await _db.GetByKeyAsync(CacheKeys.FitzyDraws);
+
+            if (winKv != null)
+            {
+                if (!int.TryParse(winKv.Value, out _winCount))
+                    _winCount = 0;
+            }
+            else
+            {
+                _winCount = 0;
+            }
+
+            if (lossKv != null)
+            {
+                if (!int.TryParse(lossKv.Value, out _lossCount))
+                    _lossCount = 0;
+            }
+            else
+            {
+                _lossCount = 0;
+            }
+
+            if (drawKv != null)
+            {
+                if (!int.TryParse(drawKv.Value, out _drawCount))
+                    _winCount = 0;
+            }
+            else
+            {
+                _drawCount = 0;
+            }
         }
 
         public async Task Invoke(HttpContext context)
@@ -54,6 +97,8 @@ namespace WebSockets
                 });
             }
 
+            var x = context.RequestServices.GetRequiredService<IRepository>();
+
             var webSocket = await context.WebSockets.AcceptWebSocketAsync();
             var guid = Guid.NewGuid();
             _sockets.TryAdd(guid, webSocket);
@@ -70,6 +115,7 @@ namespace WebSockets
                 {
                     _winCount = wins;
                     await MessageAllAsync(GetCurrentValues());
+                    await _db.CreateOrUpdateAsync(CacheKeys.FitzyWins, _winCount.ToString());
                 }
 
                 var losses = _cache.Get<int>(CacheKeys.FitzyLosses);
@@ -77,6 +123,7 @@ namespace WebSockets
                 {
                     _lossCount = losses;
                     await MessageAllAsync(GetCurrentValues());
+                    await _db.CreateOrUpdateAsync(CacheKeys.FitzyLosses, _lossCount.ToString());
                 }
 
                 var draws = _cache.Get<int>(CacheKeys.FitzyDraws);
@@ -84,6 +131,7 @@ namespace WebSockets
                 {
                     _drawCount = draws;
                     await MessageAllAsync(GetCurrentValues());
+                    await _db.CreateOrUpdateAsync(CacheKeys.FitzyDraws, _drawCount.ToString());
                 }
 
                 await Task.Delay(2000);
