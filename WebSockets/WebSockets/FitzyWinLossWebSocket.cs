@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WebSockets.Data;
+using WebSockets.Utils;
 
 namespace WebSockets
 {
@@ -114,7 +115,7 @@ namespace WebSockets
                 await Task.Delay(2000);
             }
 
-            _sockets.TryRemove(guid, out var dummy);
+            _sockets.TryRemove(guid, out _);
             await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
             webSocket.Dispose();
         }

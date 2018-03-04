@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using WebSockets.Classes;
 using WebSockets.Data;
+using WebSockets.Utils;
 
 namespace WebSockets.Controllers
 {

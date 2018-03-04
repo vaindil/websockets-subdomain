@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 
-namespace WebSockets
+namespace WebSockets.Utils
 {
     public static class CacheHelpers
     {
@@ -18,5 +18,8 @@ namespace WebSockets
         public const string FitzyWins = "FitzyWins";
         public const string FitzyLosses = "FitzyLosses";
         public const string FitzyDraws = "FitzyDraws";
+
+        public const string TwitchStreamUpDown = "TwitchStreamUpDown";
+        public const string TwitchStreamUpDownHasListeners = "TwitchStreamUpDownHasListeners";
     }
 }
