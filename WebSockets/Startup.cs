@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NetEscapades.AspNetCore.SecurityHeaders;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -38,6 +40,16 @@ namespace WebSockets
         {
             cache.Set(CacheKeys.TwitchStreamUpDown, new ConcurrentQueue<TwitchStreamUpDown>(), CacheHelpers.GetEntryOptions());
             cache.Set(CacheKeys.TwitchStreamUpDownHasListeners, false, CacheHelpers.GetEntryOptions());
+
+            app.UseSecurityHeaders(new HeaderPolicyCollection()
+                .AddDefaultSecurityHeaders()
+                .RemoveServerHeader());
+
+            app.UseCors(builder => builder
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials());
 
             app.UseWebSockets(new WebSocketOptions
             {
