@@ -25,13 +25,15 @@ namespace WebSockets.Controllers
         }
 
         [HttpGet("stream/{twitchId}")]
-        public IActionResult Verify()
+        public IActionResult Verify(SubscriptionResponse response)
         {
-            var challenge = Request.Query?.FirstOrDefault(q => q.Key == "hub.challenge");
-            if (!challenge.HasValue || challenge.Value.Key == null)
+            if (string.IsNullOrEmpty(response?.Challenge))
                 return BadRequest();
 
-            return Ok(challenge.Value.Value);
+            Console.WriteLine($"CHALLENGE RECEIVED: {response.Challenge}");
+            Console.Beep();
+
+            return Ok(response.Challenge);
         }
 
         [HttpPost("stream/{twitchId}")]
@@ -40,17 +42,16 @@ namespace WebSockets.Controllers
             if (!Request.Headers.Keys.Contains("X-Hub-Signature"))
                 return BadRequest();
 
-            if (!UpDownHasListeners())
-                return NoContent();
+            //if (!UpDownHasListeners())
+            //    return NoContent();
 
             var signature = Request.Headers.First(h => h.Key == "X-Hub-Signature").Value.ToString();
+            var sigSplit = signature.Split('=');
+            if (sigSplit.Length > 1)
+                signature = sigSplit[1];
 
-            using (var alg = new HMACSHA256(Encoding.UTF8.GetBytes(_hubSecret)))
-            {
-                var hashBytes = alg.ComputeHash(await Request.GetBodyAsBytesAsync());
-                if (Encoding.UTF8.GetString(hashBytes) != signature)
-                    return BadRequest();
-            }
+            if (!TwitchSignatureVerifier.Verify(_hubSecret, signature, await Request.GetBodyAsBytesAsync()))
+                return BadRequest();
 
             StreamStatus status;
             var body = await Request.GetBodyAsStringAsync();
@@ -60,10 +61,12 @@ namespace WebSockets.Controllers
             else
                 status = StreamStatus.Down;
 
+            Console.WriteLine($"STREAM RECEIVED: {twitchId} : {status}");
+            Console.Beep();
+            Console.Beep();
+
             var queue = _cache.Get<ConcurrentQueue<TwitchStreamUpDown>>(CacheKeys.TwitchStreamUpDown);
             queue.Enqueue(new TwitchStreamUpDown(twitchId, status));
-
-            Console.WriteLine($"QUEUE: {twitchId} {status}");
 
             return NoContent();
         }
@@ -71,6 +74,24 @@ namespace WebSockets.Controllers
         private bool UpDownHasListeners()
         {
             return _cache.Get<bool>(CacheKeys.TwitchStreamUpDownHasListeners);
+        }
+
+        public class SubscriptionResponse
+        {
+            [BindProperty(Name = "hub.mode")]
+            public string Mode { get; set; }
+
+            [BindProperty(Name = "hub.topic")]
+            public string Topic { get; set; }
+
+            [BindProperty(Name = "hub.lease_seconds")]
+            public int LeaseSeconds { get; set; }
+
+            [BindProperty(Name = "hub.challenge")]
+            public string Challenge { get; set; }
+
+            [BindProperty(Name = "hub.reason")]
+            public string Reason { get; set; }
         }
     }
 }
