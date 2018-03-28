@@ -4,10 +4,9 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
-using WebSockets.Web.Classes;
+using WebSockets.Core;
+using WebSockets.Web.Configs;
 using WebSockets.Web.Utils;
 
 namespace WebSockets.Web.Controllers

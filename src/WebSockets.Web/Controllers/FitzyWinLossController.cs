@@ -3,7 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
-using WebSockets.Web.Classes;
+using WebSockets.Web.Configs;
 using WebSockets.Web.Data;
 using WebSockets.Web.Utils;
 
@@ -135,10 +135,7 @@ namespace WebSockets.Web.Controllers
 
         private bool CheckHeader()
         {
-            if (Request.Headers.TryGetValue("Authorization", out var header) && header.ToString() == _apiSecret)
-                return true;
-
-            return false;
+            return Request.Headers.TryGetValue("Authorization", out var header) && header.ToString() == _apiSecret;
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,11 +6,13 @@ using NetEscapades.AspNetCore.SecurityHeaders;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
-using WebSockets.Web.Classes;
+using WebSockets.Core;
+using WebSockets.Web.Configs;
 using WebSockets.Web.Data;
 using WebSockets.Web.Utils;
+using WebSockets.Web.WebSockets;
 
-namespace WebSockets
+namespace WebSockets.Web
 {
     public class Startup
     {

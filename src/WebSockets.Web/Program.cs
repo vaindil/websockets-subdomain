@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
-namespace WebSockets
+namespace WebSockets.Web
 {
     public static class Program
     {

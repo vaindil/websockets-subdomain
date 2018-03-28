@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using WebSockets.Web.Data;
 using WebSockets.Web.Utils;
 
-namespace WebSockets
+namespace WebSockets.Web.WebSockets
 {
     public class FitzyWinLossWebSocket
     {
