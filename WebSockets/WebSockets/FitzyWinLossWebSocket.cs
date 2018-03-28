@@ -6,8 +6,8 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using WebSockets.Data;
-using WebSockets.Utils;
+using WebSockets.Web.Data;
+using WebSockets.Web.Utils;
 
 namespace WebSockets
 {

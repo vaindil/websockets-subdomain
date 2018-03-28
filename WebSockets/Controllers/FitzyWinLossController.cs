@@ -3,11 +3,11 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
-using WebSockets.Classes;
-using WebSockets.Data;
-using WebSockets.Utils;
+using WebSockets.Web.Classes;
+using WebSockets.Web.Data;
+using WebSockets.Web.Utils;
 
-namespace WebSockets.Controllers
+namespace WebSockets.Web.Controllers
 {
     [Route("fitzy")]
     public class FitzyWinLossController : Controller

@@ -4,7 +4,7 @@ using Npgsql;
 using System.Data;
 using System.Threading.Tasks;
 
-namespace WebSockets.Data
+namespace WebSockets.Web.Data
 {
     public class Repository : IRepository
     {

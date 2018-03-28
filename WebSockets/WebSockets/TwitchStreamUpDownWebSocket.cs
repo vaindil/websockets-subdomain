@@ -6,10 +6,10 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using WebSockets.Classes;
-using WebSockets.Utils;
+using WebSockets.Web.Classes;
+using WebSockets.Web.Utils;
 
-namespace WebSockets.WebSockets
+namespace WebSockets.Web.WebSockets
 {
     public class TwitchStreamUpDownWebSocket
     {

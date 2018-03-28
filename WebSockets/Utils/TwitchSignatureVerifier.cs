@@ -3,7 +3,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace WebSockets.Utils
+namespace WebSockets.Web.Utils
 {
     public static class TwitchSignatureVerifier
     {

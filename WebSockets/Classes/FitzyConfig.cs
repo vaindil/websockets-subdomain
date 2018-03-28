@@ -1,4 +1,4 @@
-﻿namespace WebSockets.Classes
+﻿namespace WebSockets.Web.Classes
 {
     public class FitzyConfig
     {

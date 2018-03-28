@@ -4,6 +4,8 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <CodeAnalysisRuleSet>..\WebSockets.ruleset</CodeAnalysisRuleSet>
+    <AssemblyName>WebSockets.Web</AssemblyName>
+    <RootNamespace>WebSockets.Web</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

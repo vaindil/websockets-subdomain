@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebSockets.Utils
+namespace WebSockets.Web.Utils
 {
     public static class RequestBodyExtensions
     {

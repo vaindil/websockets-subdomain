@@ -1,4 +1,4 @@
-﻿namespace WebSockets.Utils
+﻿namespace WebSockets.Web.Utils
 {
     public enum StreamStatus
     {

@@ -1,6 +1,6 @@
-﻿using WebSockets.Utils;
+﻿using WebSockets.Web.Utils;
 
-namespace WebSockets.Classes
+namespace WebSockets.Web.Classes
 {
     public class TwitchStreamUpDown
     {

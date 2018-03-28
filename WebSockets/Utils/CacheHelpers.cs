@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 
-namespace WebSockets.Utils
+namespace WebSockets.Web.Utils
 {
     public static class CacheHelpers
     {

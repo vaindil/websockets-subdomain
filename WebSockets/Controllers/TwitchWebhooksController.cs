@@ -7,10 +7,10 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using WebSockets.Classes;
-using WebSockets.Utils;
+using WebSockets.Web.Classes;
+using WebSockets.Web.Utils;
 
-namespace WebSockets.Controllers
+namespace WebSockets.Web.Controllers
 {
     [Route("twitch")]
     public class TwitchWebhooksController : Controller

@@ -7,9 +7,9 @@ using NetEscapades.AspNetCore.SecurityHeaders;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
-using WebSockets.Classes;
-using WebSockets.Data;
-using WebSockets.Utils;
+using WebSockets.Web.Classes;
+using WebSockets.Web.Data;
+using WebSockets.Web.Utils;
 
 namespace WebSockets
 {
