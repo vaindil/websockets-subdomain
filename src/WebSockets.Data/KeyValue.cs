@@ -1,7 +1,11 @@
-﻿namespace WebSockets.Web.Data
+﻿namespace WebSockets.Data
 {
     public class KeyValue
     {
+        public KeyValue()
+        {
+        }
+
         public KeyValue(string key, string value)
         {
             Key = key;

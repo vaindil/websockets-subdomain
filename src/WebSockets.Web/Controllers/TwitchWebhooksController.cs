@@ -5,8 +5,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
-using WebSockets.Core;
-using WebSockets.Web.Configs;
+using WebSockets.Web.Models;
+using WebSockets.Web.Models.Configs;
 using WebSockets.Web.Utils;
 
 namespace WebSockets.Web.Controllers

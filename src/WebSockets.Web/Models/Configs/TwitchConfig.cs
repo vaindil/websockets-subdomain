@@ -1,4 +1,4 @@
-﻿namespace WebSockets.Web.Configs
+﻿namespace WebSockets.Web.Models.Configs
 {
     public class TwitchConfig
     {

@@ -3,8 +3,8 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
-using WebSockets.Web.Configs;
-using WebSockets.Web.Data;
+using WebSockets.Data.Services;
+using WebSockets.Web.Models.Configs;
 using WebSockets.Web.Utils;
 
 namespace WebSockets.Web.Controllers
@@ -13,20 +13,20 @@ namespace WebSockets.Web.Controllers
     public class FitzyWinLossController : Controller
     {
         private readonly IMemoryCache _cache;
-        private readonly IRepository _db;
+        private readonly KeyValueService _kvSvc;
         private readonly string _apiSecret;
 
-        public FitzyWinLossController(IMemoryCache cache, IRepository db, IOptions<FitzyConfig> options)
+        public FitzyWinLossController(IMemoryCache cache, KeyValueService kvSvc, IOptions<FitzyConfig> options)
         {
             _cache = cache;
-            _db = db;
+            _kvSvc = kvSvc;
             _apiSecret = options.Value.ApiSecret;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            var record = GetCurrentRecord();
+            var record = _cache.GetCurrentFitzyRecord();
             var result = $"Wins: {record.Wins} | Losses: {record.Losses}";
 
             if (record.Draws > 0)
@@ -55,7 +55,8 @@ namespace WebSockets.Web.Controllers
                 _cache.Set(CacheKeys.FitzyWins, num);
             }
 
-            await _db.CreateOrUpdateAsync(CacheKeys.FitzyWins, num.ToString());
+            SetUpdateNeeded();
+            await _kvSvc.CreateOrUpdateAsync(CacheKeys.FitzyWins, num.ToString());
 
             return NoContent();
         }
@@ -80,7 +81,8 @@ namespace WebSockets.Web.Controllers
                 _cache.Set(CacheKeys.FitzyLosses, num);
             }
 
-            await _db.CreateOrUpdateAsync(CacheKeys.FitzyLosses, num.ToString());
+            SetUpdateNeeded();
+            await _kvSvc.CreateOrUpdateAsync(CacheKeys.FitzyLosses, num.ToString());
 
             return NoContent();
         }
@@ -105,32 +107,15 @@ namespace WebSockets.Web.Controllers
                 _cache.Set(CacheKeys.FitzyDraws, num);
             }
 
-            await _db.CreateOrUpdateAsync(CacheKeys.FitzyDraws, num.ToString());
+            SetUpdateNeeded();
+            await _kvSvc.CreateOrUpdateAsync(CacheKeys.FitzyDraws, num.ToString());
 
             return NoContent();
         }
 
-        private (int Wins, int Losses, int Draws) GetCurrentRecord()
+        private void SetUpdateNeeded()
         {
-            var wins = _cache.GetOrCreate(CacheKeys.FitzyWins, entry =>
-            {
-                entry.Priority = CacheItemPriority.NeverRemove;
-                return 0;
-            });
-
-            var losses = _cache.GetOrCreate(CacheKeys.FitzyLosses, entry =>
-            {
-                entry.Priority = CacheItemPriority.NeverRemove;
-                return 0;
-            });
-
-            var draws = _cache.GetOrCreate(CacheKeys.FitzyDraws, entry =>
-            {
-                entry.Priority = CacheItemPriority.NeverRemove;
-                return 0;
-            });
-
-            return (wins, losses, draws);
+            _cache.Set(CacheKeys.FitzyRecordUpdateNeeded, true, CacheHelpers.GetEntryOptions());
         }
 
         private bool CheckHeader()

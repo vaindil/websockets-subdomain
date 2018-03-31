@@ -11,6 +11,15 @@ namespace WebSockets.Web.Utils
                 Priority = CacheItemPriority.NeverRemove
             };
         }
+
+        public static (int Wins, int Losses, int Draws) GetCurrentFitzyRecord(this IMemoryCache cache)
+        {
+            cache.TryGetValue(CacheKeys.FitzyWins, out int wins);
+            cache.TryGetValue(CacheKeys.FitzyLosses, out int losses);
+            cache.TryGetValue(CacheKeys.FitzyDraws, out int draws);
+
+            return (wins, losses, draws);
+        }
     }
 
     public static class CacheKeys
@@ -18,6 +27,7 @@ namespace WebSockets.Web.Utils
         public const string FitzyWins = "FitzyWins";
         public const string FitzyLosses = "FitzyLosses";
         public const string FitzyDraws = "FitzyDraws";
+        public const string FitzyRecordUpdateNeeded = "FitzyRecordUpdateNeeded";
 
         public const string TwitchStreamUpDown = "TwitchStreamUpDown";
         public const string TwitchStreamUpDownHasListeners = "TwitchStreamUpDownHasListeners";
