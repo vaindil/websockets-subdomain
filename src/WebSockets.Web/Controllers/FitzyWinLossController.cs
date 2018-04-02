@@ -109,5 +109,14 @@ namespace WebSockets.Web.Controllers
 
             return NoContent();
         }
+
+        [HttpPost("refresh")]
+        [MiddlewareFilter(typeof(FitzyHeaderAuthPipeline))]
+        public async Task<IActionResult> Refresh()
+        {
+            await _wsMgr.SendAllAsync("REFRESH");
+
+            return NoContent();
+        }
     }
 }

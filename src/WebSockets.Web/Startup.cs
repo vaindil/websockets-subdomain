@@ -42,6 +42,7 @@ namespace WebSockets.Web
 
             // no, I'm not using interfaces. sue me.
             services.AddSingleton<FitzyWebSocketManager>();
+            services.AddSingleton<TwitchWebSocketManager>();
             services.AddScoped<KeyValueService>();
         }
 
