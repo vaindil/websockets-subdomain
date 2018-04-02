@@ -1,26 +1,30 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
 using WebSockets.Data.Services;
-using WebSockets.Web.Models.Configs;
+using WebSockets.Web.Auth;
 using WebSockets.Web.Utils;
+using WebSockets.Web.WebSockets;
 
 namespace WebSockets.Web.Controllers
 {
     [Route("fitzy")]
     public class FitzyWinLossController : Controller
     {
+        private readonly FitzyWebSocketManager _wsMgr;
         private readonly IMemoryCache _cache;
         private readonly KeyValueService _kvSvc;
-        private readonly string _apiSecret;
 
-        public FitzyWinLossController(IMemoryCache cache, KeyValueService kvSvc, IOptions<FitzyConfig> options)
+        public FitzyWinLossController(
+            FitzyWebSocketManager wsMgr,
+            IMemoryCache cache,
+            KeyValueService kvSvc)
         {
+            _wsMgr = wsMgr;
             _cache = cache;
             _kvSvc = kvSvc;
-            _apiSecret = options.Value.ApiSecret;
         }
 
         [HttpGet]
@@ -36,11 +40,9 @@ namespace WebSockets.Web.Controllers
         }
 
         [HttpPut("wins/{num}")]
+        [MiddlewareFilter(typeof(FitzyHeaderAuthPipeline))]
         public async Task<IActionResult> Wins(int num)
         {
-            if (!CheckHeader())
-                return Unauthorized();
-
             if (num > 99)
                 num = 99;
 
@@ -55,18 +57,16 @@ namespace WebSockets.Web.Controllers
                 _cache.Set(CacheKeys.FitzyWins, num);
             }
 
-            SetUpdateNeeded();
+            await _wsMgr.SendAllCurrentRecordAsync();
             await _kvSvc.CreateOrUpdateAsync(CacheKeys.FitzyWins, num.ToString());
 
             return NoContent();
         }
 
         [HttpPut("losses/{num}")]
+        [MiddlewareFilter(typeof(FitzyHeaderAuthPipeline))]
         public async Task<IActionResult> Losses(int num)
         {
-            if (!CheckHeader())
-                return Unauthorized();
-
             if (num > 99)
                 num = 99;
 
@@ -81,18 +81,16 @@ namespace WebSockets.Web.Controllers
                 _cache.Set(CacheKeys.FitzyLosses, num);
             }
 
-            SetUpdateNeeded();
+            await _wsMgr.SendAllCurrentRecordAsync();
             await _kvSvc.CreateOrUpdateAsync(CacheKeys.FitzyLosses, num.ToString());
 
             return NoContent();
         }
 
         [HttpPut("draws/{num}")]
+        [MiddlewareFilter(typeof(FitzyHeaderAuthPipeline))]
         public async Task<IActionResult> Draws(int num)
         {
-            if (!CheckHeader())
-                return Unauthorized();
-
             if (num > 99)
                 num = 99;
 
@@ -107,20 +105,10 @@ namespace WebSockets.Web.Controllers
                 _cache.Set(CacheKeys.FitzyDraws, num);
             }
 
-            SetUpdateNeeded();
+            await _wsMgr.SendAllCurrentRecordAsync();
             await _kvSvc.CreateOrUpdateAsync(CacheKeys.FitzyDraws, num.ToString());
 
             return NoContent();
-        }
-
-        private void SetUpdateNeeded()
-        {
-            _cache.Set(CacheKeys.FitzyRecordUpdateNeeded, true, CacheHelpers.GetEntryOptions());
-        }
-
-        private bool CheckHeader()
-        {
-            return Request.Headers.TryGetValue("Authorization", out var header) && header.ToString() == _apiSecret;
         }
     }
 }

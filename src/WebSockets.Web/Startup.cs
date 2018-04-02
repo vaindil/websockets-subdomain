@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -7,13 +8,14 @@ using NetEscapades.AspNetCore.SecurityHeaders;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
-using System.Threading.Tasks;
 using WebSockets.Data;
 using WebSockets.Data.Services;
+using WebSockets.Web.Auth;
 using WebSockets.Web.Models;
 using WebSockets.Web.Models.Configs;
 using WebSockets.Web.Utils;
 using WebSockets.Web.WebSockets;
+using WebSockets.Web.WebSockets.Middleware;
 
 namespace WebSockets.Web
 {
@@ -34,22 +36,23 @@ namespace WebSockets.Web
             services.AddEntityFrameworkNpgsql()
                 .AddDbContext<VbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("Postgres")));
 
-            services.AddMemoryCache();
             services.AddMvc();
+            services.AddMemoryCache();
 
             services.Configure<FitzyConfig>(Configuration.GetSection("Fitzy"));
             services.Configure<TwitchConfig>(Configuration.GetSection("Twitch"));
 
             // no, I'm not using interfaces. sue me.
+            services.AddSingleton<FitzyWebSocketManager>();
             services.AddScoped<KeyValueService>();
         }
 
         public void Configure(IApplicationBuilder app, IMemoryCache cache, KeyValueService kvSvc)
         {
-            InitializeFitzyMiddleware(kvSvc, cache);
+            InitializeCache(kvSvc, cache);
 
-            cache.Set(CacheKeys.TwitchStreamUpDown, new ConcurrentQueue<TwitchStreamUpDown>(), CacheHelpers.GetEntryOptions());
-            cache.Set(CacheKeys.TwitchStreamUpDownHasListeners, false, CacheHelpers.GetEntryOptions());
+            cache.Set(CacheKeys.TwitchStreamUpDown, new ConcurrentQueue<TwitchStreamUpDown>(), CacheHelpers.EntryOptions);
+            cache.Set(CacheKeys.TwitchStreamUpDownHasListeners, false, CacheHelpers.EntryOptions);
 
             app.UseSecurityHeaders(new HeaderPolicyCollection()
                 .AddDefaultSecurityHeaders()
@@ -66,11 +69,11 @@ namespace WebSockets.Web
                 KeepAliveInterval = TimeSpan.FromSeconds(20)
             });
 
-            app.UseMiddleware<FitzyWinLossWebSocket>();
+            app.UseMiddleware<FitzyWebSocketMiddleware>();
             app.UseMvc();
         }
 
-        private void InitializeFitzyMiddleware(KeyValueService kvSvc, IMemoryCache cache)
+        private void InitializeCache(KeyValueService kvSvc, IMemoryCache cache)
         {
             var winKv = kvSvc.GetByKeyAsync(CacheKeys.FitzyWins).GetAwaiter().GetResult();
             var lossKv = kvSvc.GetByKeyAsync(CacheKeys.FitzyLosses).GetAwaiter().GetResult();
@@ -80,9 +83,9 @@ namespace WebSockets.Web
             int.TryParse(lossKv?.Value, out var lossCount);
             int.TryParse(drawKv?.Value, out var drawCount);
 
-            cache.Set(CacheKeys.FitzyWins, winCount, CacheHelpers.GetEntryOptions());
-            cache.Set(CacheKeys.FitzyLosses, lossCount, CacheHelpers.GetEntryOptions());
-            cache.Set(CacheKeys.FitzyDraws, drawCount, CacheHelpers.GetEntryOptions());
+            cache.Set(CacheKeys.FitzyWins, winCount, CacheHelpers.EntryOptions);
+            cache.Set(CacheKeys.FitzyLosses, lossCount, CacheHelpers.EntryOptions);
+            cache.Set(CacheKeys.FitzyDraws, drawCount, CacheHelpers.EntryOptions);
         }
     }
 }

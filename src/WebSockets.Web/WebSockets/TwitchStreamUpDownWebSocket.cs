@@ -25,7 +25,8 @@ namespace WebSockets.Web.WebSockets
 
         public async Task Invoke(HttpContext context)
         {
-            if (context.Request.Path != "/twitch/stream/ws" || !context.WebSockets.IsWebSocketRequest) {
+            if (context.Request.Path != "/twitch/stream/ws" || !context.WebSockets.IsWebSocketRequest)
+            {
                 await _next(context);
                 return;
             }
@@ -36,7 +37,7 @@ namespace WebSockets.Web.WebSockets
             var guid = Guid.NewGuid();
             _sockets.TryAdd(guid, webSocket);
 
-            _cache.Set(CacheKeys.TwitchStreamUpDownHasListeners, true, CacheHelpers.GetEntryOptions());
+            _cache.Set(CacheKeys.TwitchStreamUpDownHasListeners, true, CacheHelpers.EntryOptions);
 
             while (_sockets.Count > 0)
             {

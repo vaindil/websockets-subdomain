@@ -4,12 +4,15 @@ namespace WebSockets.Web.Utils
 {
     public static class CacheHelpers
     {
-        public static MemoryCacheEntryOptions GetEntryOptions()
+        public static MemoryCacheEntryOptions EntryOptions
         {
-            return new MemoryCacheEntryOptions
+            get
             {
-                Priority = CacheItemPriority.NeverRemove
-            };
+                return new MemoryCacheEntryOptions
+                {
+                    Priority = CacheItemPriority.NeverRemove
+                };
+            }
         }
 
         public static (int Wins, int Losses, int Draws) GetCurrentFitzyRecord(this IMemoryCache cache)
@@ -27,7 +30,6 @@ namespace WebSockets.Web.Utils
         public const string FitzyWins = "FitzyWins";
         public const string FitzyLosses = "FitzyLosses";
         public const string FitzyDraws = "FitzyDraws";
-        public const string FitzyRecordUpdateNeeded = "FitzyRecordUpdateNeeded";
 
         public const string TwitchStreamUpDown = "TwitchStreamUpDown";
         public const string TwitchStreamUpDownHasListeners = "TwitchStreamUpDownHasListeners";
