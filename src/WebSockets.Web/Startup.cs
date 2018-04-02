@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -10,7 +9,6 @@ using System.Collections.Concurrent;
 using System.IO;
 using WebSockets.Data;
 using WebSockets.Data.Services;
-using WebSockets.Web.Auth;
 using WebSockets.Web.Models;
 using WebSockets.Web.Models.Configs;
 using WebSockets.Web.Utils;
@@ -70,6 +68,7 @@ namespace WebSockets.Web
             });
 
             app.UseMiddleware<FitzyWebSocketMiddleware>();
+            app.UseMiddleware<TwitchWebSocketMiddleware>();
             app.UseMvc();
         }
 

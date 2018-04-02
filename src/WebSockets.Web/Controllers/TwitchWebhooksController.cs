@@ -1,26 +1,27 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using WebSockets.Web.Models;
 using WebSockets.Web.Models.Configs;
 using WebSockets.Web.Utils;
+using WebSockets.Web.WebSockets;
 
 namespace WebSockets.Web.Controllers
 {
     [Route("twitch")]
     public class TwitchWebhooksController : Controller
     {
-        private readonly IMemoryCache _cache;
         private readonly string _hubSecret;
+        private readonly TwitchWebSocketManager _wsMgr;
 
-        public TwitchWebhooksController(IMemoryCache cache, IOptions<TwitchConfig> options)
+        public TwitchWebhooksController(
+            IOptions<TwitchConfig> options,
+            TwitchWebSocketManager wsMgr)
         {
-            _cache = cache;
             _hubSecret = options.Value.HubSecret;
+            _wsMgr = wsMgr;
         }
 
         [HttpGet("stream/{twitchId}")]
@@ -40,9 +41,6 @@ namespace WebSockets.Web.Controllers
         {
             if (!Request.Headers.Keys.Contains("X-Hub-Signature"))
                 return BadRequest();
-
-            //if (!UpDownHasListeners())
-            //    return NoContent();
 
             var signature = Request.Headers.First(h => h.Key == "X-Hub-Signature").Value.ToString();
             var sigSplit = signature.Split('=');
@@ -64,15 +62,9 @@ namespace WebSockets.Web.Controllers
             Console.Beep();
             Console.Beep();
 
-            var queue = _cache.Get<ConcurrentQueue<TwitchStreamUpDown>>(CacheKeys.TwitchStreamUpDown);
-            queue.Enqueue(new TwitchStreamUpDown(twitchId, status));
+            await _wsMgr.SendAllAsync($"{status.ToString().ToUpper()}: {twitchId}");
 
             return NoContent();
-        }
-
-        private bool UpDownHasListeners()
-        {
-            return _cache.Get<bool>(CacheKeys.TwitchStreamUpDownHasListeners);
         }
 
         public class SubscriptionResponse
