@@ -57,6 +57,12 @@ namespace WebSockets.Web.WebSockets
             if (!_sockets.TryGetValue(guid, out var socket))
                 return;
 
+            if (socket.State != WebSocketState.Open)
+            {
+                await RemoveWebSocketAsync(guid);
+                return;
+            }
+
             await SendMessageAsync(socket, message);
         }
 
@@ -73,11 +79,19 @@ namespace WebSockets.Web.WebSockets
 
         private async Task SendMessageAsync(WebSocket socket, string message)
         {
-            await socket.SendAsync(
-                new ArraySegment<byte>(Encoding.UTF8.GetBytes(message)),
-                WebSocketMessageType.Text,
-                true,
-                CancellationToken.None);
+            try
+            {
+                await socket.SendAsync(
+                    new ArraySegment<byte>(Encoding.UTF8.GetBytes(message)),
+                    WebSocketMessageType.Text,
+                    true,
+                    CancellationToken.None);
+            }
+            catch (WebSocketException ex)
+            {
+                if (!(ex.InnerException is ObjectDisposedException))
+                    throw;
+            }
         }
 
         private async Task RemoveWebSocketAsync(Guid guid)
