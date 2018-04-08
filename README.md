@@ -10,7 +10,7 @@ The primary function of the site right now is an API and websocket for [Fitzyher
 
 ### Websocket
 
-Websocket connections are accepted to provide the current record and an update whenever the record changes. The page using this is currently [vaindil.xyz/fitzy](https://vaindil.xyz/fitzy). That page is displayed on the stream with an [OBS](https://obsproject.com) [browser source](https://obsproject.com/wiki/Sources-Guide#browsersource).
+Websocket connections are accepted to provide the current record and an update whenever the record changes. The pages using this are currently at [vaindil.xyz/fitzy](https://vaindil.xyz/fitzy) (for example, [Overwatch](https://vaindil.xyz/fitzy/overwatch) and [Fortnite](https://vaindil.xyz/fitzy/fortnite)). That page is displayed on the stream with an [OBS](https://obsproject.com) [browser source](https://obsproject.com/wiki/Sources-Guide#browsersource).
 
 ## Acknowledgements
 
