@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace WebSockets.Web
 {
@@ -12,6 +13,7 @@ namespace WebSockets.Web
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureLogging(l => l.SetMinimumLevel(LogLevel.Warning))
                 .UseKestrel(o => o.AddServerHeader = false)
                 .UseStartup<Startup>()
                 .Build();
