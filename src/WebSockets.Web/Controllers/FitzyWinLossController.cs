@@ -110,6 +110,23 @@ namespace WebSockets.Web.Controllers
             return NoContent();
         }
 
+        [HttpPut("clear")]
+        [MiddlewareFilter(typeof(FitzyHeaderAuthPipeline))]
+        public async Task<IActionResult> Clear()
+        {
+            _cache.Set(CacheKeys.FitzyWins, 0);
+            _cache.Set(CacheKeys.FitzyLosses, 0);
+            _cache.Set(CacheKeys.FitzyDraws, 0);
+
+            await _wsMgr.SendAllCurrentRecordAsync();
+
+            await _kvSvc.CreateOrUpdateAsync(CacheKeys.FitzyWins, "0");
+            await _kvSvc.CreateOrUpdateAsync(CacheKeys.FitzyLosses, "0");
+            await _kvSvc.CreateOrUpdateAsync(CacheKeys.FitzyDraws, "0");
+
+            return NoContent();
+        }
+
         [HttpPost("refresh")]
         [MiddlewareFilter(typeof(FitzyHeaderAuthPipeline))]
         public async Task<IActionResult> Refresh()
