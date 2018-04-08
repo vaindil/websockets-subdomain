@@ -7,6 +7,7 @@ using NetEscapades.AspNetCore.SecurityHeaders;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Net.Http.Headers;
 using WebSockets.Data;
 using WebSockets.Data.Services;
 using WebSockets.Web.Models;
@@ -36,6 +37,21 @@ namespace WebSockets.Web
 
             services.AddMvc();
             services.AddMemoryCache();
+            services.AddHttpClient(NamedHttpClients.TwitchV5, client =>
+            {
+                client.BaseAddress = new Uri("https://api.twitch.tv/kraken/");
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("OAuth", Configuration["Twitch:OAuthToken"]);
+                client.DefaultRequestHeaders.Add("Client-ID", Configuration["Twitch:ClientId"]);
+                client.DefaultRequestHeaders.Add("Content-Type", "application/vnd.twitchtv.v5+json");
+            });
+
+            services.AddHttpClient(NamedHttpClients.TwitchHelix, client =>
+            {
+                client.BaseAddress = new Uri("https://api.twitch.tv/helix/");
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Configuration["Twitch:OAuthToken"]);
+                client.DefaultRequestHeaders.Add("Client-ID", Configuration["Twitch:ClientId"]);
+                client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+            });
 
             services.Configure<FitzyConfig>(Configuration.GetSection("Fitzy"));
             services.Configure<TwitchConfig>(Configuration.GetSection("Twitch"));
