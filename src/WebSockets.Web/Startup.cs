@@ -32,7 +32,7 @@ namespace WebSockets.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddEntityFrameworkNpgsql()
-                .AddDbContext<VbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("Postgres")));
+                .AddDbContext<WsContext>(options => options.UseNpgsql(Configuration.GetConnectionString("Postgres")));
 
             services.AddMvc();
             services.AddMemoryCache();
@@ -44,6 +44,7 @@ namespace WebSockets.Web
             services.AddSingleton<FitzyWebSocketManager>();
             services.AddSingleton<TwitchWebSocketManager>();
             services.AddScoped<KeyValueService>();
+            services.AddScoped<TwitchService>();
         }
 
         public void Configure(IApplicationBuilder app, IMemoryCache cache, KeyValueService kvSvc)

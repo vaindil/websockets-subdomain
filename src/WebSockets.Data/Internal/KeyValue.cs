@@ -1,4 +1,4 @@
-﻿namespace WebSockets.Data
+﻿namespace WebSockets.Data.Internal
 {
     public class KeyValue
     {

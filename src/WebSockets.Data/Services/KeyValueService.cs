@@ -1,12 +1,13 @@
 ﻿using System.Threading.Tasks;
+using WebSockets.Data.Internal;
 
 namespace WebSockets.Data.Services
 {
     public class KeyValueService
     {
-        readonly VbContext _context;
+        private readonly WsContext _context;
 
-        public KeyValueService(VbContext context)
+        public KeyValueService(WsContext context)
         {
             _context = context;
         }
