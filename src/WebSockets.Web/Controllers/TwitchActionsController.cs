@@ -17,6 +17,22 @@ namespace WebSockets.Web.Controllers
             _wsMgr = wsMgr;
         }
 
+        [HttpPut("live")]
+        public async Task<IActionResult> StreamLive()
+        {
+            await _wsMgr.SendAllAsync("LIVE");
+
+            return NoContent();
+        }
+
+        [HttpPut("offline")]
+        public async Task<IActionResult> StreamOffline()
+        {
+            await _wsMgr.SendAllAsync("OFFLINE");
+
+            return NoContent();
+        }
+
         [HttpPost]
         [MiddlewareFilter(typeof(FitzyHeaderAuthPipeline))]
         public async Task<IActionResult> AddReport([FromBody]TwitchActionModel model)
