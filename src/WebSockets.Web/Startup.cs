@@ -59,6 +59,7 @@ namespace WebSockets.Web
             // no, I'm not using interfaces. sue me.
             services.AddSingleton<FitzyWebSocketManager>();
             services.AddSingleton<TwitchWebSocketManager>();
+            services.AddSingleton<TwitchActionsWebSocketManager>();
             services.AddScoped<KeyValueService>();
         }
 
@@ -85,6 +86,7 @@ namespace WebSockets.Web
             });
 
             app.UseMiddleware<FitzyWebSocketMiddleware>();
+            app.UseMiddleware<TwitchActionsWebSocketMiddleware>();
             app.UseMiddleware<TwitchWebSocketMiddleware>();
             app.UseMvc();
         }

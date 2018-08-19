@@ -11,7 +11,7 @@ using WebSockets.Web.WebSockets;
 namespace WebSockets.Web.Controllers
 {
     [Route("twitch")]
-    public class TwitchWebhooksController : Controller
+    public class TwitchWebhooksController : ControllerBase
     {
         private readonly string _hubSecret;
         private readonly TwitchWebSocketManager _wsMgr;

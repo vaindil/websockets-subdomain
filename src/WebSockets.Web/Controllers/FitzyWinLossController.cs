@@ -10,7 +10,7 @@ using WebSockets.Web.WebSockets;
 namespace WebSockets.Web.Controllers
 {
     [Route("fitzy")]
-    public class FitzyWinLossController : Controller
+    public class FitzyWinLossController : ControllerBase
     {
         private readonly FitzyWebSocketManager _wsMgr;
         private readonly IMemoryCache _cache;
