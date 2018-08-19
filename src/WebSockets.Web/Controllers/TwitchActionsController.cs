@@ -18,6 +18,7 @@ namespace WebSockets.Web.Controllers
         }
 
         [HttpPut("live")]
+        [MiddlewareFilter(typeof(FitzyHeaderAuthPipeline))]
         public async Task<IActionResult> StreamLive()
         {
             await _wsMgr.SendAllAsync("LIVE");
@@ -26,6 +27,7 @@ namespace WebSockets.Web.Controllers
         }
 
         [HttpPut("offline")]
+        [MiddlewareFilter(typeof(FitzyHeaderAuthPipeline))]
         public async Task<IActionResult> StreamOffline()
         {
             await _wsMgr.SendAllAsync("OFFLINE");
