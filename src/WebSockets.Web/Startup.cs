@@ -69,6 +69,7 @@ namespace WebSockets.Web
 
             cache.Set(CacheKeys.TwitchStreamUpDown, new ConcurrentQueue<TwitchStreamUpDown>(), CacheHelpers.EntryOptions);
             cache.Set(CacheKeys.TwitchStreamUpDownHasListeners, false, CacheHelpers.EntryOptions);
+            cache.Set(CacheKeys.ZubatSecondsRemaining, 31310, CacheHelpers.EntryOptions);
 
             app.UseSecurityHeaders(new HeaderPolicyCollection()
                 .AddDefaultSecurityHeaders()

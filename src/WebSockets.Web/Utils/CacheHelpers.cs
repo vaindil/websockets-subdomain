@@ -33,5 +33,7 @@ namespace WebSockets.Web.Utils
 
         public const string TwitchStreamUpDown = "TwitchStreamUpDown";
         public const string TwitchStreamUpDownHasListeners = "TwitchStreamUpDownHasListeners";
+
+        public const string ZubatSecondsRemaining = "ZubatSecondsRemaining";
     }
 }
