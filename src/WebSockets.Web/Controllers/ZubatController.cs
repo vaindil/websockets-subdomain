@@ -1,34 +1,39 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Threading.Tasks;
-using WebSockets.Web.Auth;
-using WebSockets.Web.Utils;
-using WebSockets.Web.WebSockets;
+using WebSockets.Data;
 
 namespace WebSockets.Web.Controllers
 {
     [Route("zubat")]
     public class ZubatController : ControllerBase
     {
-        private readonly ZubatWebSocketManager _wsMgr;
-        private readonly IMemoryCache _cache;
+        private readonly VbContext _context;
 
-        public ZubatController(ZubatWebSocketManager wsMgr, IMemoryCache cache)
+        public ZubatController(VbContext context)
         {
-            _wsMgr = wsMgr;
-            _cache = cache;
+            _context = context;
         }
 
-        [HttpPut("{seconds}")]
-        [MiddlewareFilter(typeof(FitzyHeaderAuthPipeline))]
-        public async Task<IActionResult> AddSeconds(int seconds)
+        [HttpPut("vote/{emoteName}/{isVoteForNew}")]
+        public async Task<IActionResult> SubmitVote(string emoteName, bool isVoteForNew)
         {
-            _cache.TryGetValue<int>(CacheKeys.ZubatSecondsRemaining, out var curSeconds);
-            curSeconds += seconds;
+            var ipAddress = HttpContext.Connection.RemoteIpAddress;
+            var vote = await _context.EmoteVotes.FirstOrDefaultAsync(x => x.IpAddress == ipAddress && x.EmoteName == emoteName);
+            if (vote != null)
+                return NoContent();
 
-            await _wsMgr.SendAllAsync(curSeconds.ToString());
+            vote = new EmoteVote
+            {
+                IpAddress = ipAddress,
+                LoggedAt = DateTime.UtcNow,
+                EmoteName = emoteName,
+                IsVoteForNew = isVoteForNew
+            };
 
-            _cache.Set(CacheKeys.ZubatSecondsRemaining, curSeconds);
+            _context.EmoteVotes.Add(vote);
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }

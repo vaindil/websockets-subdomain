@@ -11,12 +11,14 @@ namespace WebSockets.Data
         }
 
         public DbSet<KeyValue> KeyValues { get; set; }
+        public DbSet<EmoteVote> EmoteVotes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new KeyValueConfiguration());
+            modelBuilder.ApplyConfiguration(new EmoteVoteConfiguration());
         }
     }
 }
