@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -53,6 +54,8 @@ namespace WebSockets.Web
                 client.DefaultRequestHeaders.Add("Content-Type", "application/json");
             });
 
+            services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.All);
+
             services.Configure<FitzyConfig>(Configuration.GetSection("Fitzy"));
             services.Configure<TwitchConfig>(Configuration.GetSection("Twitch"));
 
@@ -70,6 +73,8 @@ namespace WebSockets.Web
             cache.Set(CacheKeys.TwitchStreamUpDown, new ConcurrentQueue<TwitchStreamUpDown>(), CacheHelpers.EntryOptions);
             cache.Set(CacheKeys.TwitchStreamUpDownHasListeners, false, CacheHelpers.EntryOptions);
             cache.Set(CacheKeys.ZubatSecondsRemaining, 31310, CacheHelpers.EntryOptions);
+
+            app.UseForwardedHeaders();
 
             app.UseSecurityHeaders(new HeaderPolicyCollection()
                 .AddDefaultSecurityHeaders()
