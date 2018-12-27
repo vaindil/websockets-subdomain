@@ -13,6 +13,6 @@ namespace WebSockets.Data
 
         public string EmoteName { get; set; }
 
-        public bool IsVoteForNew { get; set; }
+        public string VoteFor { get; set; }
     }
 }

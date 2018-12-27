@@ -14,7 +14,7 @@ namespace WebSockets.Data.Configs
             builder.Property(x => x.IpAddress).HasColumnName("ip_address").IsRequired();
             builder.Property(x => x.LoggedAt).HasColumnName("logged_at").IsRequired();
             builder.Property(x => x.EmoteName).HasColumnName("emote_name").IsRequired();
-            builder.Property(x => x.IsVoteForNew).HasColumnName("is_vote_for_new").IsRequired();
+            builder.Property(x => x.VoteFor).HasColumnName("vote_for").IsRequired();
         }
     }
 }

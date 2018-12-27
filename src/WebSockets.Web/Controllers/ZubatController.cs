@@ -16,8 +16,8 @@ namespace WebSockets.Web.Controllers
             _context = context;
         }
 
-        [HttpPut("vote/{emoteName}/{isVoteForNew}")]
-        public async Task<IActionResult> SubmitVote(string emoteName, bool isVoteForNew)
+        [HttpPut("vote/{emoteName}/{voteFor}")]
+        public async Task<IActionResult> SubmitVote(string emoteName, string voteFor)
         {
             var ipAddress = HttpContext.Connection.RemoteIpAddress;
             var vote = await _context.EmoteVotes.FirstOrDefaultAsync(x => x.IpAddress == ipAddress && x.EmoteName == emoteName);
@@ -29,7 +29,7 @@ namespace WebSockets.Web.Controllers
                 IpAddress = ipAddress,
                 LoggedAt = DateTime.UtcNow,
                 EmoteName = emoteName,
-                IsVoteForNew = isVoteForNew
+                VoteFor = voteFor
             };
 
             _context.EmoteVotes.Add(vote);
