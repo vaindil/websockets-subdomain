@@ -53,6 +53,8 @@ namespace WebSockets.Web
                 client.DefaultRequestHeaders.Add("Content-Type", "application/json");
             });
 
+            services.AddHttpContextAccessor();
+
             services.Configure<FitzyConfig>(Configuration.GetSection("Fitzy"));
             services.Configure<TwitchConfig>(Configuration.GetSection("Twitch"));
 
