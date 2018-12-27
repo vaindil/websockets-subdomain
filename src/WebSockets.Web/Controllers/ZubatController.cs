@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
@@ -11,18 +10,16 @@ namespace WebSockets.Web.Controllers
     public class ZubatController : ControllerBase
     {
         private readonly VbContext _context;
-        private readonly IHttpContextAccessor _accessor;
 
-        public ZubatController(VbContext context, IHttpContextAccessor accessor)
+        public ZubatController(VbContext context)
         {
             _context = context;
-            _accessor = accessor;
         }
 
         [HttpPut("vote/{emoteName}/{voteFor}")]
         public async Task<IActionResult> SubmitVote(string emoteName, string voteFor)
         {
-            var ipAddress = _accessor.HttpContext.Connection.RemoteIpAddress;
+            var ipAddress = HttpContext.Connection.RemoteIpAddress;
             var vote = await _context.EmoteVotes.FirstOrDefaultAsync(x => x.IpAddress == ipAddress && x.EmoteName == emoteName);
             if (vote != null)
                 return NoContent();
