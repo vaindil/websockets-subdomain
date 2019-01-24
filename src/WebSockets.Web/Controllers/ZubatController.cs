@@ -173,6 +173,42 @@ namespace WebSockets.Web.Controllers
             return NoContent();
         }
 
+        [HttpPut("requests/{username}/{count}")]
+        [MiddlewareFilter(typeof(ZubatJwtAuthMiddleware))]
+        public async Task<IActionResult> AddRequests(string username, int count)
+        {
+            var twitchId = HttpContext.Items["TwitchId"];
+            if (!_zubatConfig.RequestAdminTwitchIds.Contains(twitchId))
+                return Forbid();
+
+            var userResponse = await _twitchApi.Users.GetUsersAsync(logins: new List<string> { username });
+            if (userResponse.Users.Length == 0)
+                return BadRequest("Twitch user does not exist");
+
+            var twitchUser = userResponse.Users[0];
+            var user = await _context.RequestUsers.FindAsync(twitchUser.Id);
+            if (user == null)
+            {
+                user = new RequestUser
+                {
+                    TwitchId = twitchUser.Id,
+                    LastUsername = twitchUser.DisplayName,
+                    RequestCount = count
+                };
+
+                _context.RequestUsers.Add(user);
+            }
+            else
+            {
+                user.RequestCount += count;
+                _context.RequestUsers.Update(user);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(user.RequestCount);
+        }
+
         [HttpGet("twitch")]
         public async Task<IActionResult> HandleAuthCode([FromQuery]string code)
         {
