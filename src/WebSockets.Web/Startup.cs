@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NetEscapades.AspNetCore.SecurityHeaders;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
-using System.Net.Http.Headers;
+using TwitchLib.Api;
+using TwitchLib.Api.Helix;
 using WebSockets.Data;
 using WebSockets.Data.Services;
 using WebSockets.Web.Models;
@@ -38,26 +38,19 @@ namespace WebSockets.Web
 
             services.AddMvc();
             services.AddMemoryCache();
-            services.AddHttpClient(NamedHttpClients.TwitchV5, client =>
-            {
-                client.BaseAddress = new Uri("https://api.twitch.tv/kraken/");
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("OAuth", Configuration["Twitch:OAuthToken"]);
-                client.DefaultRequestHeaders.Add("Client-ID", Configuration["Twitch:ClientId"]);
-                client.DefaultRequestHeaders.Add("Content-Type", "application/vnd.twitchtv.v5+json");
-            });
 
-            services.AddHttpClient(NamedHttpClients.TwitchHelix, client =>
-            {
-                client.BaseAddress = new Uri("https://api.twitch.tv/helix/");
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Configuration["Twitch:OAuthToken"]);
-                client.DefaultRequestHeaders.Add("Client-ID", Configuration["Twitch:ClientId"]);
-                client.DefaultRequestHeaders.Add("Content-Type", "application/json");
-            });
+            services.AddHttpClient(NamedHttpClients.TwitchOAuth,
+                options => options.BaseAddress = new Uri("https://id.twitch.tv/oauth2/"));
 
             services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.All);
 
             services.Configure<FitzyConfig>(Configuration.GetSection("Fitzy"));
-            services.Configure<TwitchConfig>(Configuration.GetSection("Twitch"));
+            services.Configure<ZubatConfig>(Configuration.GetSection("Zubat"));
+
+            var twitchApi = new Helix();
+            twitchApi.Settings.ClientId = Configuration["Zubat:TwitchClientId"];
+
+            services.AddSingleton(twitchApi);
 
             // no, I'm not using interfaces. sue me.
             services.AddSingleton<FitzyWebSocketManager>();
@@ -72,7 +65,6 @@ namespace WebSockets.Web
 
             cache.Set(CacheKeys.TwitchStreamUpDown, new ConcurrentQueue<TwitchStreamUpDown>(), CacheHelpers.EntryOptions);
             cache.Set(CacheKeys.TwitchStreamUpDownHasListeners, false, CacheHelpers.EntryOptions);
-            cache.Set(CacheKeys.ZubatSecondsRemaining, 31310, CacheHelpers.EntryOptions);
 
             app.UseForwardedHeaders();
 
