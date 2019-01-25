@@ -239,7 +239,8 @@ namespace WebSockets.Web.Controllers
             var jwtPayload = new Dictionary<string, object>
             {
                 { "twitch_id", idToken.Sub },
-                { "username", username }
+                { "username", username },
+                { "is_admin", _zubatConfig.RequestAdminTwitchIds.Contains(idToken.Sub) }
             };
 
             var key = Encoding.UTF8.GetBytes(_zubatConfig.JwtSigningKey);
