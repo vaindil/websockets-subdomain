@@ -13,7 +13,11 @@ namespace WebSockets.Web
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .ConfigureLogging(l => l.SetMinimumLevel(LogLevel.Warning))
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.AddConsole();
+                })
                 .UseKestrel(o => o.AddServerHeader = false)
                 .UseStartup<Startup>()
                 .Build();

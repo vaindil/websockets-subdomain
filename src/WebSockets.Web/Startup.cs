@@ -4,11 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
 using TwitchLib.Api;
 using TwitchLib.Api.Helix;
+using VainBot.Infrastructure;
 using WebSockets.Data;
 using WebSockets.Data.Services;
 using WebSockets.Web.Models;
@@ -51,6 +54,8 @@ namespace WebSockets.Web
             twitchApi.Settings.ClientId = Configuration["Zubat:TwitchClientId"];
 
             services.AddSingleton(twitchApi);
+
+            services.Replace(ServiceDescriptor.Singleton(typeof(ILogger<>), typeof(TimedLogger<>)));
 
             // no, I'm not using interfaces. sue me.
             services.AddSingleton<FitzyWebSocketManager>();
