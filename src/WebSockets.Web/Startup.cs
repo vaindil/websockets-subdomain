@@ -49,6 +49,7 @@ namespace WebSockets.Web
 
             services.Configure<FitzyConfig>(Configuration.GetSection("Fitzy"));
             services.Configure<ZubatConfig>(Configuration.GetSection("Zubat"));
+            services.Configure<TwitchConfig>(Configuration.GetSection("Twitch"));
 
             var twitchApi = new Helix();
             twitchApi.Settings.ClientId = Configuration["Zubat:TwitchClientId"];
