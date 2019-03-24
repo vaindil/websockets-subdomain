@@ -37,18 +37,20 @@ namespace WebSockets.Web.Controllers
         }
 
         [HttpGet("{channel}")]
-        public IActionResult VerifyWebhook()
+        public IActionResult VerifyWebhook(string channel)
         {
-            _logger.LogInformation("Twitch webhook verification received");
+            _logger.LogInformation($"Twitch webhook verification received for {channel}");
 
             Request.Query.TryGetValue("hub.challenge", out var challenge);
 
-            return Ok(challenge);
+            return Ok(challenge.ToString());
         }
 
         [HttpPost("{channel}")]
         public async Task<IActionResult> HandleWebhook(string channel)
         {
+            _logger.LogInformation($"Received Twitch webhook for {channel}");
+
             var bytes = await Request.GetBodyAsBytesAsync();
             if (!Request.Query.TryGetValue("X-Hub-Signature", out var signature))
                 return BadRequest();
