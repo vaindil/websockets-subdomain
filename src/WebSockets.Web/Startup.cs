@@ -7,14 +7,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
-using TwitchLib.Api;
 using TwitchLib.Api.Helix;
 using VainBot.Infrastructure;
 using WebSockets.Data;
 using WebSockets.Data.Services;
-using WebSockets.Web.Models;
 using WebSockets.Web.Models.Configs;
 using WebSockets.Web.Utils;
 using WebSockets.Web.WebSockets;
@@ -69,8 +67,7 @@ namespace WebSockets.Web
         {
             InitializeCache(kvSvc, cache);
 
-            cache.Set(CacheKeys.TwitchStreamUpDown, new ConcurrentQueue<TwitchStreamUpDown>(), CacheHelpers.EntryOptions);
-            cache.Set(CacheKeys.TwitchStreamUpDownHasListeners, false, CacheHelpers.EntryOptions);
+            cache.Set(CacheKeys.TwitchNotificationIds, new List<string>(), CacheHelpers.EntryOptions);
 
             app.UseForwardedHeaders();
 

@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebSockets.Web.Models.Configs;
@@ -18,7 +17,7 @@ namespace WebSockets.Web.Controllers
     [Route("twitch_webhooks")]
     public class TwitchWebhooksController : ControllerBase
     {
-        private readonly IMemoryCache _cache;
+        private readonly List<string> _notificationIds;
         private readonly FitzyWebSocketManager _fitzyWsMgr;
         private readonly TwitchConfig _twitchConfig;
 
@@ -30,7 +29,7 @@ namespace WebSockets.Web.Controllers
             IOptions<TwitchConfig> twitchOptions,
             ILogger<TwitchWebhooksController> logger)
         {
-            _cache = cache;
+            _notificationIds = cache.Get<List<string>>(CacheKeys.TwitchNotificationIds);
             _fitzyWsMgr = fitzyWsMgr;
             _twitchConfig = twitchOptions.Value;
             _logger = logger;
@@ -52,11 +51,23 @@ namespace WebSockets.Web.Controllers
             _logger.LogInformation($"Received Twitch webhook for {channel}");
 
             var bytes = await Request.GetBodyAsBytesAsync();
-            if (!Request.Query.TryGetValue("X-Hub-Signature", out var signature))
+            if (!Request.Headers.TryGetValue("X-Hub-Signature", out var signature))
+            {
+                _logger.LogWarning("No X-Hub-Signature header found");
                 return BadRequest();
+            }
 
             if (!TwitchSignatureVerifier.Verify(_twitchConfig.WebhookSecret, signature.ToString(), bytes))
+            {
+                _logger.LogWarning("X-Hub-Signature is invalid");
                 return BadRequest();
+            }
+
+            Request.Headers.TryGetValue("Twitch-Notification-Id", out var notificationId);
+            if (_notificationIds.Contains(notificationId))
+                return NoContent();
+
+            _notificationIds.Add(notificationId);
 
             var bodyString = Encoding.UTF8.GetString(bytes);
             var payload = JsonConvert.DeserializeObject<StreamUpDownPayload>(bodyString);

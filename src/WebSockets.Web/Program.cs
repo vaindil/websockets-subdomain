@@ -19,6 +19,8 @@ namespace WebSockets.Web
                     logging.AddConsole();
                 })
                 .UseKestrel(o => o.AddServerHeader = false)
+                // used for local debugging
+                // .UseUrls("http://0.0.0.0:52875")
                 .UseStartup<Startup>()
                 .Build();
     }

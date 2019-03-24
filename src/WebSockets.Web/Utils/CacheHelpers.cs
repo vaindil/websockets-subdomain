@@ -31,7 +31,6 @@ namespace WebSockets.Web.Utils
         public const string FitzyLosses = "FitzyLosses";
         public const string FitzyDraws = "FitzyDraws";
 
-        public const string TwitchStreamUpDown = "TwitchStreamUpDown";
-        public const string TwitchStreamUpDownHasListeners = "TwitchStreamUpDownHasListeners";
+        public const string TwitchNotificationIds = "TwitchNotificationIds";
     }
 }

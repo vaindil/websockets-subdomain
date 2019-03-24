@@ -9,6 +9,9 @@ namespace WebSockets.Web.Utils
     {
         public static bool Verify(string secret, string signature, byte[] body)
         {
+            if (signature.StartsWith("sha256="))
+                signature = signature.Substring(7);
+
             using (var alg = new HMACSHA256(Encoding.UTF8.GetBytes(secret)))
             {
                 var hexSignature = BytesToHex(alg.ComputeHash(body)).ToLowerInvariant();
