@@ -18,14 +18,14 @@ namespace WebSockets.Web.Controllers
     public class TwitchWebhooksController : ControllerBase
     {
         private readonly List<string> _notificationIds;
-        private readonly FitzyWebSocketManager _fitzyWsMgr;
+        private readonly TwitchActionsWebSocketManager _fitzyWsMgr;
         private readonly TwitchConfig _twitchConfig;
 
         private readonly ILogger _logger;
 
         public TwitchWebhooksController(
             IMemoryCache cache,
-            FitzyWebSocketManager fitzyWsMgr,
+            TwitchActionsWebSocketManager fitzyWsMgr,
             IOptions<TwitchConfig> twitchOptions,
             ILogger<TwitchWebhooksController> logger)
         {
