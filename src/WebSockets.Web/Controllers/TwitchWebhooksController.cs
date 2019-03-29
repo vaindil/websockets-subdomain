@@ -64,8 +64,12 @@ namespace WebSockets.Web.Controllers
             }
 
             Request.Headers.TryGetValue("Twitch-Notification-Id", out var notificationId);
+            _logger.LogInformation($"The notification's ID is: {notificationId}");
             if (_notificationIds.Contains(notificationId))
+            {
+                _logger.LogInformation("This notification ID is already being tracked, webhook ignored.");
                 return NoContent();
+            }
 
             _notificationIds.Add(notificationId);
 
