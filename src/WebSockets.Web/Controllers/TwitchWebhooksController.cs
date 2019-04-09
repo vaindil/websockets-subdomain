@@ -45,10 +45,10 @@ namespace WebSockets.Web.Controllers
             return Ok(challenge.ToString());
         }
 
-        [HttpPost("{channel}")]
-        public async Task<IActionResult> HandleWebhook(string channel)
+        [HttpPost]
+        public async Task<IActionResult> HandleWebhook([FromQuery]string username, [FromQuery]string userId)
         {
-            _logger.LogInformation($"Received Twitch webhook for {channel}");
+            _logger.LogInformation($"Received Twitch webhook for {username}");
 
             var bytes = await Request.GetBodyAsBytesAsync();
             if (!Request.Headers.TryGetValue("X-Hub-Signature", out var signature))
@@ -67,25 +67,23 @@ namespace WebSockets.Web.Controllers
             _logger.LogInformation($"The notification's ID is: {notificationId}");
             if (_notificationIds.Contains(notificationId))
             {
-                _logger.LogInformation("This notification ID is already being tracked, webhook ignored.");
+                _logger.LogInformation("Notification ID already being tracked, webhook ignored.");
                 return NoContent();
             }
 
             _notificationIds.Add(notificationId);
 
             var bodyString = Encoding.UTF8.GetString(bytes);
-            var payload = JsonConvert.DeserializeObject<StreamUpDownPayload>(bodyString);
+            var payload = JsonConvert.DeserializeObject<StreamChangedPayload>(bodyString);
 
-            var message = "LIVE";
+            var notificationMsg = new StreamChangedNotificationMessage(username, userId, payload.Data);
+            var msgBody = JsonConvert.SerializeObject(notificationMsg);
 
-            if (payload.Data.Count == 0)
-                message = "OFFLINE";
+            _logger.LogInformation($"Stream status changed for channel {username}");
 
-            _logger.LogInformation($"Stream status changed: {channel} is now {message}.");
-
-            if (string.Equals(channel, "fitzyhere", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(username, "fitzyhere", StringComparison.OrdinalIgnoreCase))
             {
-                await _fitzyWsMgr.SendAllAsync(message);
+                await _fitzyWsMgr.SendAllAsync(msgBody);
             }
 
             return NoContent();
