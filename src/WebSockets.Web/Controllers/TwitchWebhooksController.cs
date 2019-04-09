@@ -35,10 +35,10 @@ namespace WebSockets.Web.Controllers
             _logger = logger;
         }
 
-        [HttpGet("{channel}")]
-        public IActionResult VerifyWebhook(string channel)
+        [HttpGet]
+        public IActionResult VerifyWebhook([FromQuery]string username, [FromQuery]string userId)
         {
-            _logger.LogInformation($"Twitch webhook verification received for {channel}");
+            _logger.LogInformation($"Twitch webhook verification received for {username} ({userId})");
 
             Request.Query.TryGetValue("hub.challenge", out var challenge);
 
