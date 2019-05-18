@@ -1,0 +1,13 @@
+[Unit]
+Description=Websockets Subdomain
+After=network.target
+
+[Service]
+Type=simple
+User=websockets-subdomain
+WorkingDirectory=/home/websockets-subdomain/build
+ExecStart=/usr/bin/dotnet /home/websockets-subdomain/build/WebSockets.Web.dll
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
