@@ -45,16 +45,28 @@ namespace WebSockets.Web.Controllers
         public async Task<IActionResult> AddReport([FromBody]TwitchActionModel model)
         {
             if (model == null)
+            {
+                _logger.LogInformation("Twitch action request received: no body");
                 return BadRequest("request was empty");
+            }
 
             if (string.IsNullOrEmpty(model.ModUsername))
+            {
+                _logger.LogInformation("Twitch action request received: no mod username");
                 return BadRequest("mod username was empty");
+            }
 
             if (string.IsNullOrEmpty(model.UserUsername))
+            {
+                _logger.LogInformation("Twitch action request received: no user username");
                 return BadRequest("user username was empty");
+            }
 
             if (string.IsNullOrEmpty(model.Action))
+            {
+                _logger.LogInformation("Twitch action request received: no action");
                 return BadRequest("action was empty");
+            }
 
             // FORMAT:
             // ACTION vaindil KeithyDee timeout 600 no reason
@@ -74,7 +86,7 @@ namespace WebSockets.Web.Controllers
 
             await _wsMgr.SendAllAsync(final);
 
-            _logger.LogInformation($"Fitzy Twitch action received: {final}");
+            _logger.LogInformation($"Twitch action request received: {final}");
 
             return NoContent();
         }
