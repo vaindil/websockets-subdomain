@@ -8,6 +8,7 @@ User=websockets-subdomain
 WorkingDirectory=/home/websockets-subdomain/build
 ExecStart=/usr/bin/dotnet /home/websockets-subdomain/build/WebSockets.Web.dll
 Restart=on-failure
+Environment=ASPNETCORE_URLS="http://*:5052"
 
 [Install]
 WantedBy=multi-user.target
