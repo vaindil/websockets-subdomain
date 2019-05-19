@@ -46,6 +46,7 @@ namespace WebSockets.Web
             services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.All);
 
             services.Configure<FitzyConfig>(Configuration.GetSection("Fitzy"));
+            services.Configure<CrendorConfig>(Configuration.GetSection("Crendor"));
             services.Configure<ZubatConfig>(Configuration.GetSection("Zubat"));
             services.Configure<TwitchConfig>(Configuration.GetSection("Twitch"));
 
@@ -60,6 +61,7 @@ namespace WebSockets.Web
             services.AddSingleton<FitzyWebSocketManager>();
             services.AddSingleton<TwitchWebSocketManager>();
             services.AddSingleton<TwitchActionsWebSocketManager>();
+            services.AddSingleton<CrendorWebSocketManager>();
             services.AddScoped<KeyValueService>();
         }
 
@@ -78,8 +80,7 @@ namespace WebSockets.Web
             app.UseCors(builder => builder
                 .AllowAnyOrigin()
                 .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials());
+                .AllowAnyMethod());
 
             app.UseWebSockets(new WebSocketOptions
             {
@@ -89,6 +90,7 @@ namespace WebSockets.Web
             app.UseMiddleware<FitzyWebSocketMiddleware>();
             app.UseMiddleware<TwitchActionsWebSocketMiddleware>();
             app.UseMiddleware<TwitchWebSocketMiddleware>();
+            app.UseMiddleware<CrendorWebSocketMiddleware>();
             app.UseMvc();
         }
 
@@ -98,13 +100,18 @@ namespace WebSockets.Web
             var lossKv = kvSvc.GetByKeyAsync(CacheKeys.FitzyLosses).GetAwaiter().GetResult();
             var drawKv = kvSvc.GetByKeyAsync(CacheKeys.FitzyDraws).GetAwaiter().GetResult();
 
-            int.TryParse(winKv?.Value, out var winCount);
-            int.TryParse(lossKv?.Value, out var lossCount);
-            int.TryParse(drawKv?.Value, out var drawCount);
+            int.TryParse(winKv?.Value ?? "0", out var winCount);
+            int.TryParse(lossKv?.Value ?? "0", out var lossCount);
+            int.TryParse(drawKv?.Value ?? "0", out var drawCount);
 
             cache.Set(CacheKeys.FitzyWins, winCount, CacheHelpers.EntryOptions);
             cache.Set(CacheKeys.FitzyLosses, lossCount, CacheHelpers.EntryOptions);
             cache.Set(CacheKeys.FitzyDraws, drawCount, CacheHelpers.EntryOptions);
+
+            var crendorPointsKv = kvSvc.GetByKeyAsync(CacheKeys.CrendorSubPoints).GetAwaiter().GetResult();
+            int.TryParse(crendorPointsKv?.Value ?? "-1", out var crendorPoints);
+
+            cache.Set(CacheKeys.CrendorSubPoints, crendorPoints, CacheHelpers.EntryOptions);
         }
     }
 }

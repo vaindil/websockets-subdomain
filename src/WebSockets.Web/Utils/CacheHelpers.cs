@@ -32,5 +32,7 @@ namespace WebSockets.Web.Utils
         public const string FitzyDraws = "FitzyDraws";
 
         public const string TwitchNotificationIds = "TwitchNotificationIds";
+
+        public const string CrendorSubPoints = "CrendorSubPoints";
     }
 }
