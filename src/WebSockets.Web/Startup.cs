@@ -34,11 +34,12 @@ namespace WebSockets.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMemoryCache();
+
             services.AddEntityFrameworkNpgsql()
                 .AddDbContext<VbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("Postgres")));
 
             services.AddControllers();
-            services.AddMemoryCache();
 
             services.AddHttpClient(NamedHttpClients.TwitchOAuth,
                 options => options.BaseAddress = new Uri("https://id.twitch.tv/oauth2/"));
