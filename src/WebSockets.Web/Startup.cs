@@ -47,7 +47,6 @@ namespace WebSockets.Web
 
             services.Configure<FitzyConfig>(Configuration.GetSection("Fitzy"));
             services.Configure<CrendorConfig>(Configuration.GetSection("Crendor"));
-            services.Configure<ZubatConfig>(Configuration.GetSection("Zubat"));
             services.Configure<TwitchConfig>(Configuration.GetSection("Twitch"));
 
             var twitchApi = new Helix();
