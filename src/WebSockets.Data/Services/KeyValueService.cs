@@ -4,14 +4,14 @@ namespace WebSockets.Data.Services
 {
     public class KeyValueService
     {
-        readonly VbContext _context;
+        private readonly VbContext _context;
 
         public KeyValueService(VbContext context)
         {
             _context = context;
         }
 
-        public Task<KeyValue> GetByKeyAsync(string key)
+        public ValueTask<KeyValue> GetByKeyAsync(string key)
         {
             return _context.KeyValues.FindAsync(key);
         }

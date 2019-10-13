@@ -37,7 +37,7 @@ namespace WebSockets.Web
             services.AddEntityFrameworkNpgsql()
                 .AddDbContext<VbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("Postgres")));
 
-            services.AddMvc();
+            services.AddControllers();
             services.AddMemoryCache();
 
             services.AddHttpClient(NamedHttpClients.TwitchOAuth,
@@ -91,7 +91,9 @@ namespace WebSockets.Web
             app.UseMiddleware<TwitchActionsWebSocketMiddleware>();
             app.UseMiddleware<TwitchWebSocketMiddleware>();
             app.UseMiddleware<CrendorWebSocketMiddleware>();
-            app.UseMvc();
+
+            app.UseRouting();
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
 
         private void InitializeCache(KeyValueService kvSvc, IMemoryCache cache)
