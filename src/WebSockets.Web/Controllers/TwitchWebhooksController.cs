@@ -2,10 +2,10 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using WebSockets.Web.Models.Configs;
 using WebSockets.Web.Models.TwitchWebhooks;
@@ -74,10 +74,10 @@ namespace WebSockets.Web.Controllers
             _notificationIds.Add(notificationId);
 
             var bodyString = Encoding.UTF8.GetString(bytes);
-            var payload = JsonConvert.DeserializeObject<StreamChangedPayload>(bodyString);
+            var payload = JsonSerializer.Deserialize<StreamChangedPayload>(bodyString);
 
             var notificationMsg = new StreamChangedNotificationMessage(username, userId, payload.Data);
-            var msgBody = JsonConvert.SerializeObject(notificationMsg);
+            var msgBody = JsonSerializer.Serialize(notificationMsg);
 
             _logger.LogInformation($"Stream status changed for channel {username}");
 

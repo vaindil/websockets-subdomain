@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace WebSockets.Web.Models.TwitchWebhooks
 {
@@ -30,7 +30,7 @@ namespace WebSockets.Web.Models.TwitchWebhooks
         }
 
         // either "live" or "offline"
-        [JsonProperty(PropertyName = "status")]
+        [JsonPropertyName("status")]
         public string Status { get; set; }
     }
 }

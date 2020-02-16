@@ -1,22 +1,22 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace WebSockets.Web.Models
 {
     public class TwitchIdResponse
     {
-        [JsonProperty(PropertyName = "access_token")]
+        [JsonPropertyName("access_token")]
         public string AccessToken { get; set; }
 
-        [JsonProperty(PropertyName = "refresh_token")]
+        [JsonPropertyName("refresh_token")]
         public string RefreshToken { get; set; }
 
-        [JsonProperty(PropertyName = "expires_in")]
+        [JsonPropertyName("expires_in")]
         public string ExpiresIn { get; set; }
 
-        [JsonProperty(PropertyName = "id_token")]
+        [JsonPropertyName("id_token")]
         public string IdToken { get; set; }
 
-        [JsonProperty(PropertyName = "token_type")]
+        [JsonPropertyName("token_type")]
         public string TokenType { get; set; }
     }
 }

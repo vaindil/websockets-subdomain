@@ -12,11 +12,9 @@ namespace WebSockets.Web.Utils
             if (signature.StartsWith("sha256="))
                 signature = signature.Substring(7);
 
-            using (var alg = new HMACSHA256(Encoding.UTF8.GetBytes(secret)))
-            {
-                var hexSignature = BytesToHex(alg.ComputeHash(body)).ToLowerInvariant();
-                return hexSignature == signature;
-            }
+            using var alg = new HMACSHA256(Encoding.UTF8.GetBytes(secret));
+            var hexSignature = BytesToHex(alg.ComputeHash(body)).ToLowerInvariant();
+            return hexSignature == signature;
         }
 
         private static string BytesToHex(IEnumerable<byte> input)

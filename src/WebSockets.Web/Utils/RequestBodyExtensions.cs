@@ -19,8 +19,8 @@ namespace WebSockets.Web.Utils
             if (encoding == null)
                 encoding = Encoding.UTF8;
 
-            using (var reader = new StreamReader(request.Body, encoding))
-                return await reader.ReadToEndAsync();
+            using var reader = new StreamReader(request.Body, encoding);
+            return await reader.ReadToEndAsync();
         }
 
         /// <summary>
@@ -31,11 +31,9 @@ namespace WebSockets.Web.Utils
         /// <returns>Request body as a byte array</returns>
         public static async Task<byte[]> GetBodyAsBytesAsync(this HttpRequest request)
         {
-            using (var ms = new MemoryStream(2048))
-            {
-                await request.Body.CopyToAsync(ms);
-                return ms.ToArray();
-            }
+            using var ms = new MemoryStream(2048);
+            await request.Body.CopyToAsync(ms);
+            return ms.ToArray();
         }
     }
 }

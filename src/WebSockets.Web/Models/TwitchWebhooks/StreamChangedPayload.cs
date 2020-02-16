@@ -1,42 +1,41 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace WebSockets.Web.Models.TwitchWebhooks
 {
     public class StreamChangedPayload
     {
-        [JsonProperty(PropertyName = "data")]
+        [JsonPropertyName("data")]
         public List<StreamChangedData> Data { get; set; }
     }
 
     public class StreamChangedData
     {
-        [JsonProperty(PropertyName = "id")]
+        [JsonPropertyName("id")]
         public string Id { get; set; }
 
-        [JsonProperty(PropertyName = "user_id")]
+        [JsonPropertyName("user_id")]
         public string UserId { get; set; }
 
-        [JsonProperty(PropertyName = "user_name")]
+        [JsonPropertyName("user_name")]
         public string Username { get; set; }
 
-        [JsonProperty(PropertyName = "game_id")]
+        [JsonPropertyName("game_id")]
         public string GameId { get; set; }
 
-        [JsonProperty(PropertyName = "title")]
+        [JsonPropertyName("title")]
         public string Title { get; set; }
 
-        [JsonProperty(PropertyName = "viewer_count")]
+        [JsonPropertyName("viewer_count")]
         public int? ViewerCount { get; set; }
 
         // this could be DateTimeOffset with no additional logic required,
         // but this payload is just passed on through so it doesn't need
         // to be parsed
-        [JsonProperty(PropertyName = "started_at")]
+        [JsonPropertyName("started_at")]
         public string StartedAt { get; set; }
 
-        [JsonProperty(PropertyName = "thumbnail_url")]
+        [JsonPropertyName("thumbnail_url")]
         public string ThumbnailUrl { get; set; }
     }
 }

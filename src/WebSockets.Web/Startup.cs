@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using TwitchLib.Api.Helix;
 using VainBot.Infrastructure;
 using WebSockets.Data;
 using WebSockets.Data.Services;
@@ -49,11 +48,6 @@ namespace WebSockets.Web
             services.Configure<FitzyConfig>(Configuration.GetSection("Fitzy"));
             services.Configure<CrendorConfig>(Configuration.GetSection("Crendor"));
             services.Configure<TwitchConfig>(Configuration.GetSection("Twitch"));
-
-            var twitchApi = new Helix();
-            twitchApi.Settings.ClientId = Configuration["Zubat:TwitchClientId"];
-
-            services.AddSingleton(twitchApi);
 
             services.Replace(ServiceDescriptor.Singleton(typeof(ILogger<>), typeof(TimedLogger<>)));
 
