@@ -3,10 +3,10 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using WebSockets.Data;
 using WebSockets.Web.Models.Configs;
 using WebSockets.Web.Models.TwitchWebhooks;
 using WebSockets.Web.Utils;
@@ -17,21 +17,27 @@ namespace WebSockets.Web.Controllers
     [Route("twitch_webhooks")]
     public class TwitchWebhooksController : ControllerBase
     {
-        private readonly List<string> _notificationIds;
+        private readonly TwitchWebSocketManager _wsMgr;
         private readonly TwitchActionsWebSocketManager _fitzyWsMgr;
         private readonly TwitchConfig _twitchConfig;
+        private readonly VbContext _context;
 
+        private readonly IMemoryCache _cache;
         private readonly ILogger _logger;
 
         public TwitchWebhooksController(
-            IMemoryCache cache,
+            TwitchWebSocketManager wsMgr,
             TwitchActionsWebSocketManager fitzyWsMgr,
             IOptions<TwitchConfig> twitchOptions,
+            VbContext context,
+            IMemoryCache cache,
             ILogger<TwitchWebhooksController> logger)
         {
-            _notificationIds = cache.Get<List<string>>(CacheKeys.TwitchNotificationIds);
+            _wsMgr = wsMgr;
             _fitzyWsMgr = fitzyWsMgr;
             _twitchConfig = twitchOptions.Value;
+            _context = context;
+            _cache = cache;
             _logger = logger;
         }
 
@@ -65,13 +71,13 @@ namespace WebSockets.Web.Controllers
 
             Request.Headers.TryGetValue("Twitch-Notification-Id", out var notificationId);
             _logger.LogInformation($"The notification's ID is: {notificationId}");
-            if (_notificationIds.Contains(notificationId))
+            if (_cache.TryGetValue(notificationId, out _))
             {
                 _logger.LogInformation("Notification ID already being tracked, webhook ignored.");
                 return NoContent();
             }
 
-            _notificationIds.Add(notificationId);
+            _cache.Set(notificationId, "", TimeSpan.FromDays(3));
 
             var bodyString = Encoding.UTF8.GetString(bytes);
             var payload = JsonSerializer.Deserialize<StreamChangedPayload>(bodyString);
@@ -81,10 +87,25 @@ namespace WebSockets.Web.Controllers
 
             _logger.LogInformation($"Stream status changed for channel {username}");
 
+            await _wsMgr.SendAllAsync(msgBody);
+
             if (string.Equals(username, "fitzyhere", StringComparison.OrdinalIgnoreCase))
             {
                 await _fitzyWsMgr.SendAllAsync(msgBody);
             }
+
+            _context.TwitchWebhookNotifications.Add(new TwitchWebhookNotification
+            {
+                Id = notificationId,
+                ReceivedAt = DateTimeOffset.UtcNow,
+                UserId = userId,
+                Username = username,
+                GameId = payload.Data?[0]?.GameId,
+                Title = payload.Data?[0]?.Title,
+                StartedAt = payload.Data?[0]?.StartedAt
+            });
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }

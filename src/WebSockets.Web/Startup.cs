@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using VainBot.Infrastructure;
 using WebSockets.Data;
@@ -59,11 +58,9 @@ namespace WebSockets.Web
             services.AddScoped<KeyValueService>();
         }
 
-        public void Configure(IApplicationBuilder app, IMemoryCache cache, KeyValueService kvSvc)
+        public void Configure(IApplicationBuilder app, IMemoryCache cache, KeyValueService kvSvc, VbContext vbContext)
         {
-            InitializeCache(kvSvc, cache);
-
-            cache.Set(CacheKeys.TwitchNotificationIds, new List<string>(), CacheHelpers.EntryOptions);
+            InitializeCache(kvSvc, vbContext, cache);
 
             app.UseForwardedHeaders();
 
@@ -90,7 +87,7 @@ namespace WebSockets.Web
             app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
 
-        private void InitializeCache(KeyValueService kvSvc, IMemoryCache cache)
+        private void InitializeCache(KeyValueService kvSvc, VbContext vbContext, IMemoryCache cache)
         {
             var winKv = kvSvc.GetByKeyAsync(CacheKeys.FitzyWins).GetAwaiter().GetResult();
             var lossKv = kvSvc.GetByKeyAsync(CacheKeys.FitzyLosses).GetAwaiter().GetResult();
@@ -108,6 +105,13 @@ namespace WebSockets.Web
             int.TryParse(crendorPointsKv?.Value ?? "-1", out var crendorPoints);
 
             cache.Set(CacheKeys.CrendorSubPoints, crendorPoints, CacheHelpers.EntryOptions);
+
+            foreach (var notification in vbContext.TwitchWebhookNotifications.ToListAsync().GetAwaiter().GetResult())
+            {
+                var expiresAt = notification.ReceivedAt + TimeSpan.FromDays(3);
+                if (DateTimeOffset.UtcNow < expiresAt)
+                    cache.Set(notification.Id, "", expiresAt);
+            }
         }
     }
 }

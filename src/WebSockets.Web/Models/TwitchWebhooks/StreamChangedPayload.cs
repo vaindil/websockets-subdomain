@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace WebSockets.Web.Models.TwitchWebhooks
@@ -29,11 +30,8 @@ namespace WebSockets.Web.Models.TwitchWebhooks
         [JsonPropertyName("viewer_count")]
         public int? ViewerCount { get; set; }
 
-        // this could be DateTimeOffset with no additional logic required,
-        // but this payload is just passed on through so it doesn't need
-        // to be parsed
         [JsonPropertyName("started_at")]
-        public string StartedAt { get; set; }
+        public DateTimeOffset StartedAt { get; set; }
 
         [JsonPropertyName("thumbnail_url")]
         public string ThumbnailUrl { get; set; }

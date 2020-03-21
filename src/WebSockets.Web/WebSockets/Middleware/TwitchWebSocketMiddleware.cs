@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
+using WebSockets.Web.Models.Configs;
 
 namespace WebSockets.Web.WebSockets.Middleware
 {
@@ -7,13 +9,16 @@ namespace WebSockets.Web.WebSockets.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly TwitchWebSocketManager _wsMgr;
+        private readonly TwitchConfig _config;
 
         public TwitchWebSocketMiddleware(
             RequestDelegate next,
-            TwitchWebSocketManager wsMgr)
+            TwitchWebSocketManager wsMgr,
+            IOptions<TwitchConfig> options)
         {
             _next = next;
             _wsMgr = wsMgr;
+            _config = options.Value;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -28,6 +33,12 @@ namespace WebSockets.Web.WebSockets.Middleware
             {
                 context.Response.StatusCode = 400;
                 await context.Response.WriteAsync("This endpoint accepts only websocket connections.");
+                return;
+            }
+
+            if (!context.Request.Query.TryGetValue("key", out var key) || key.ToString() != _config.SocketSecret)
+            {
+                context.Response.StatusCode = 401;
                 return;
             }
 
