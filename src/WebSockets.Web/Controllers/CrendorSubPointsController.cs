@@ -29,9 +29,37 @@ namespace WebSockets.Web.Controllers
             return Ok(points);
         }
 
+        /// <summary>
+        /// Adds a given number of points to the current total.
+        /// </summary>
+        /// <param name="num">Number of points to add to the total</param>
+        [HttpPost("points/{num}")]
+        [MiddlewareFilter(typeof(CrendorHeaderAuthPipeline))]
+        public async Task<IActionResult> AddPoints(int num)
+        {
+            if (!_cache.TryGetValue(CacheKeys.CrendorSubPoints, out int curPoints))
+            {
+                curPoints = 0;
+            }
+
+            num += curPoints;
+            var numString = num.ToString();
+
+            _cache.Set(CacheKeys.CrendorSubPoints, num, CacheHelpers.EntryOptions);
+            await _wsMgr.SendAllAsync(numString);
+
+            await _kvSvc.CreateOrUpdateAsync(CacheKeys.CrendorSubPoints, numString);
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Sets the current total.
+        /// </summary>
+        /// <param name="num">Total to set</param>
         [HttpPut("points/{num}")]
         [MiddlewareFilter(typeof(CrendorHeaderAuthPipeline))]
-        public async Task<IActionResult> Points(int num)
+        public async Task<IActionResult> SetPoints(int num)
         {
             var numString = num.ToString();
 
