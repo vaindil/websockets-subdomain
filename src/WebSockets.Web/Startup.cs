@@ -47,6 +47,7 @@ namespace WebSockets.Web
             services.Configure<FitzyConfig>(Configuration.GetSection("Fitzy"));
             services.Configure<CrendorConfig>(Configuration.GetSection("Crendor"));
             services.Configure<TwitchConfig>(Configuration.GetSection("Twitch"));
+            services.Configure<TwitchOAuthGeneratorConfig>(Configuration.GetSection("TwitchOAuthGenerator"));
 
             services.Replace(ServiceDescriptor.Singleton(typeof(ILogger<>), typeof(TimedLogger<>)));
 
